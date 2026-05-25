@@ -15,6 +15,10 @@ const {
   transcodeVideo
 } = require("./transcoder.processor");
 
+const {
+  generateHLS
+} = require("./hls.processor");
+
 const processVideoJob = async (job) => {
   try {
     console.log("Processing video:");
@@ -68,6 +72,13 @@ const processVideoJob = async (job) => {
 
     console.log("Transcoding completed");
 
+    await generateHLS(
+      inputPath,
+      outputDir
+    );
+
+    console.log("HLS generation completed");
+
     await generateThumbnail(
       inputPath,
       outputDir
@@ -92,28 +103,72 @@ const processVideoJob = async (job) => {
       "image/jpeg"
     );
 
-    console.log("Files uploaded");
+    console.log("Thumbnail uploaded");
+
+    const outputFiles =
+      fs.readdirSync(outputDir);
+
+    for (const file of outputFiles) {
+
+      const filePath = path.join(
+        outputDir,
+        file
+      );
+
+      if (file.endsWith(".m3u8")) {
+
+        await uploadFile(
+          process.env.PROCESSED_BUCKET_NAME,
+          `hls/${job.videoId}/${file}`,
+          filePath,
+          "application/vnd.apple.mpegurl"
+        );
+
+        console.log(
+          `${file} uploaded`
+        );
+      }
+
+      if (file.endsWith(".ts")) {
+
+        await uploadFile(
+          process.env.PROCESSED_BUCKET_NAME,
+          `hls/${job.videoId}/${file}`,
+          filePath,
+          "video/mp2t"
+        );
+
+        console.log(
+          `${file} uploaded`
+        );
+      }
+    }
+
+    console.log("HLS files uploaded");
+
+    const files =
+      fs.readdirSync(outputDir);
+
+    for (const file of files) {
+
+      const filePath = path.join(
+        outputDir,
+        file
+      );
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
 
     if (fs.existsSync(inputPath)) {
       fs.unlinkSync(inputPath);
     }
 
-    if (fs.existsSync(outputVideoPath)) {
-      fs.unlinkSync(outputVideoPath);
-    }
-
-    const thumbnailPath = path.join(
-      outputDir,
-      "thumbnail.jpg"
-    );
-
-    if (fs.existsSync(thumbnailPath)) {
-      fs.unlinkSync(thumbnailPath);
-    }
-
     console.log("Cleanup completed");
 
   } catch (error) {
+
     console.error(
       "Video processing failed:"
     );
