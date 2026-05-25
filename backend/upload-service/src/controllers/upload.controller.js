@@ -2,6 +2,10 @@ const {
   generateUploadUrl
 } = require("../services/upload.service");
 
+const {
+  publishVideoJob
+} = require("../services/queue.service");
+
 const createUploadUrl = async (req, res) => {
   try {
     const { fileName, contentType } = req.body;
@@ -16,6 +20,13 @@ const createUploadUrl = async (req, res) => {
       fileName,
       contentType
     );
+
+    await publishVideoJob({
+      videoId: data.videoId,
+      fileName,
+      s3Key: data.key,
+      status: "UPLOADED"
+    });
 
     return res.status(200).json(data);
 

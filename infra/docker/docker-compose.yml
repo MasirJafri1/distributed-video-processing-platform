@@ -26,3 +26,12 @@ services:
 
     depends_on:
       - upload-service
+
+  transcoder-worker:
+    build:
+      context: ../../workers/transcoder-worker
+
+    container_name: transcoder-worker
+
+    env_file:
+      - ../../workers/transcoder-worker/.env
