@@ -24,3 +24,17 @@ module "ec2" {
 
   key_name = "video-platform-key"
 }
+
+module "s3" {
+  source = "../../modules/s3"
+
+  project_name = var.project_name
+  environment  = var.environment
+}
+
+module "sqs" {
+  source = "../../modules/sqs"
+
+  project_name = var.project_name
+  environment  = var.environment
+}
