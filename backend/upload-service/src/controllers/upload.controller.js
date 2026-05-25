@@ -20,7 +20,7 @@ const createUploadUrl = async (req, res) => {
       fileName,
       contentType
     );
-
+    // NOTE : comment for testing
     await publishVideoJob({
       videoId: data.videoId,
       fileName,
