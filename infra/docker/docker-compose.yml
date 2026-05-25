@@ -10,6 +10,9 @@ services:
     ports:
       - "3000:3000"
 
+    env_file:
+      - ../../backend/upload-service/.env
+
   nginx:
     image: nginx:latest
 
