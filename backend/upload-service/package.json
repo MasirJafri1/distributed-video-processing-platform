@@ -10,6 +10,7 @@
     "@aws-sdk/client-sqs": "^3.1053.0",
     "@aws-sdk/s3-request-presigner": "^3.1053.0",
     "@prisma/client": "^6.19.3",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^4.19.2",
     "prisma": "^6.19.3",

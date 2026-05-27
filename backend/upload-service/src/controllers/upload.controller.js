@@ -33,12 +33,12 @@ const createUploadUrl = async (req, res) => {
     });
 
     // NOTE : comment for testing
-    await publishVideoJob({
-      videoId: data.videoId,
-      fileName,
-      s3Key: data.key,
-      status: "UPLOADED"
-    });
+    // await publishVideoJob({
+    //   videoId: data.videoId,
+    //   fileName,
+    //   s3Key: data.key,
+    //   status: "UPLOADED"
+    // });
 
     return res.status(200).json(data);
 
