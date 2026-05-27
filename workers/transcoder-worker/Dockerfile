@@ -5,9 +5,11 @@ RUN apt-get update && \
 
 WORKDIR /app
 
+ENV NODE_ENV=production
+
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
@@ -18,6 +20,8 @@ RUN npx prisma generate
 RUN mkdir -p temp output
 
 RUN useradd -m appuser
+
+RUN chown -R appuser:appuser /app
 
 USER appuser
 

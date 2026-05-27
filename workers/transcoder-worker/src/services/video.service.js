@@ -1,5 +1,7 @@
 const prisma =
   require("../db/prisma");
+const redisClient =
+  require("../config/redis");
 
 const markVideoProcessed =
   async (
@@ -9,7 +11,7 @@ const markVideoProcessed =
     hlsUrl
   ) => {
 
-  return prisma.video.update({
+  const updatedVideo = await prisma.video.update({
     where: {
       id: videoId
     },
@@ -25,6 +27,10 @@ const markVideoProcessed =
       hlsMasterUrl: hlsUrl
     }
   });
+
+await redisClient.del("videos");
+
+return updatedVideo;
 };
 
 module.exports = {

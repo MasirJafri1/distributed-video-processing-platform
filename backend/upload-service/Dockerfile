@@ -1,12 +1,12 @@
 FROM node:22-alpine
 
-RUN apk add --no-cache openssl libc6-compat
-
 WORKDIR /app
+
+ENV NODE_ENV=production
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
@@ -17,6 +17,8 @@ RUN npx prisma generate
 EXPOSE 3000
 
 RUN adduser -D appuser
+
+RUN chown -R appuser:appuser /app
 
 USER appuser
 

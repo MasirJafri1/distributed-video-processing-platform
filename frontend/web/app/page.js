@@ -26,7 +26,7 @@ export default function Home() {
     fetchVideos();
 
     const interval =
-      setInterval(fetchVideos, 5000);
+      setInterval(fetchVideos, 15000);
 
     return () =>
       clearInterval(interval);

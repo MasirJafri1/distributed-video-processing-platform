@@ -50,6 +50,8 @@ services:
       - ../../workers/transcoder-worker/.env
     environment:
       DATABASE_URL: postgresql://admin:password@postgres:5432/video_platform
+    deploy:
+      replicas: 3
 
   postgres:
     image: postgres:16
@@ -66,6 +68,14 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+    container_name: redis
+
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:

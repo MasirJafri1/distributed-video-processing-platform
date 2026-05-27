@@ -48,7 +48,7 @@ resource "aws_security_group" "ec2_sg" {
 
 resource "aws_instance" "app_server" {
   ami           = "ami-03bb6d83c60fc5f7c"
-  instance_type = "t3.micro"
+  instance_type = "t3.small"
 
   subnet_id = var.public_subnet_id
 
@@ -65,4 +65,20 @@ resource "aws_instance" "app_server" {
   tags = {
     Name = "${var.project_name}-${var.environment}-server"
   }
+}
+
+resource "aws_eip" "video_platform_eip" {
+
+  domain = "vpc"
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-eip"
+  }
+}
+
+resource "aws_eip_association" "video_platform_eip_assoc" {
+
+  instance_id = aws_instance.app_server.id
+
+  allocation_id = aws_eip.video_platform_eip.id
 }
