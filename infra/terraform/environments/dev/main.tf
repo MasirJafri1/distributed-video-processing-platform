@@ -30,6 +30,8 @@ module "s3" {
 
   project_name = var.project_name
   environment  = var.environment
+
+  video_queue_arn = module.sqs.queue_arn
 }
 
 module "sqs" {

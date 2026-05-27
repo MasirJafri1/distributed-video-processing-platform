@@ -40,3 +40,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "raw_lifecycle" {
     }
   }
 }
+
+resource "aws_s3_bucket_notification" "raw_upload_events" {
+
+  bucket = aws_s3_bucket.raw_videos.id
+
+  queue {
+
+    queue_arn = var.video_queue_arn
+
+    events = [
+      "s3:ObjectCreated:*"
+    ]
+
+    filter_prefix = "raw/"
+  }
+}

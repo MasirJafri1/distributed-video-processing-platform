@@ -5,3 +5,7 @@ variable "project_name" {
 variable "environment" {
   type = string
 }
+
+variable "video_queue_arn" {
+  type = string
+}

@@ -45,13 +45,6 @@ export default function UploadBox({
         body: file
       });
 
-      await fetch(
-        `https://sqs.ap-south-1.amazonaws.com/YOUR_ACCOUNT_ID/video-platform-dev-video-processing`,
-        {
-          method: "POST"
-        }
-      );
-
       onUploadComplete();
 
       alert("Upload successful");

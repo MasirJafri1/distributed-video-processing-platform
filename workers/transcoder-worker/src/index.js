@@ -17,9 +17,21 @@ const startWorker = async () => {
       const messages = await pollMessages();
 
       for (const message of messages) {
-        const body = JSON.parse(
-          message.Body
-        );
+        const s3Event = JSON.parse(message.Body);
+
+        const record = s3Event.Records[0];
+
+        const s3Key = decodeURIComponent(record.s3.object.key);
+
+        const fileName = s3Key.split("/").pop();
+
+        const videoId = fileName.split("-")[0];
+
+        const body = {
+          videoId,
+          fileName,
+          s3Key
+        };
 
         await processVideoJob(body);
 
