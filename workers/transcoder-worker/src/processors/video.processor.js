@@ -2,6 +2,9 @@ const path = require("path");
 
 const fs = require("fs");
 
+const logger =
+  require("../utils/logger");
+
 const {
   downloadFile,
   uploadFile
@@ -25,9 +28,9 @@ const {
 
 const processVideoJob = async (job) => {
   try {
-    console.log("Processing video:");
+    logger.info("Processing video:");
 
-    console.log(job);
+    logger.info(job);
 
     const tempDir = path.join(
       __dirname,
@@ -67,28 +70,28 @@ const processVideoJob = async (job) => {
       inputPath
     );
 
-    console.log("Video downloaded");
+    logger.info("Video downloaded");
 
     await transcodeVideo(
       inputPath,
       outputVideoPath
     );
 
-    console.log("Transcoding completed");
+    logger.info("Transcoding completed");
 
     await generateHLS(
       inputPath,
       outputDir
     );
 
-    console.log("HLS generation completed");
+    logger.info("HLS generation completed");
 
     await generateThumbnail(
       inputPath,
       outputDir
     );
 
-    console.log("Thumbnail generated");
+    logger.info("Thumbnail generated");
 
     await uploadFile(
       process.env.PROCESSED_BUCKET_NAME,
@@ -107,7 +110,7 @@ const processVideoJob = async (job) => {
       "image/jpeg"
     );
 
-    console.log("Thumbnail uploaded");
+    logger.info("Thumbnail uploaded");
 
     const outputFiles =
       fs.readdirSync(outputDir);
@@ -128,7 +131,7 @@ const processVideoJob = async (job) => {
           "application/vnd.apple.mpegurl"
         );
 
-        console.log(
+        logger.info(
           `${file} uploaded`
         );
       }
@@ -142,13 +145,13 @@ const processVideoJob = async (job) => {
           "video/mp2t"
         );
 
-        console.log(
+        logger.info(
           `${file} uploaded`
         );
       }
     }
 
-    console.log("HLS files uploaded");
+    logger.info("HLS files uploaded");
 
     await markVideoProcessed(
     job.videoId,
@@ -160,7 +163,7 @@ const processVideoJob = async (job) => {
     `hls/${job.videoId}/index.m3u8`
   );
 
-  console.log("Database updated");
+  logger.info("Database updated");
 
     const files =
       fs.readdirSync(outputDir);
@@ -181,15 +184,15 @@ const processVideoJob = async (job) => {
       fs.unlinkSync(inputPath);
     }
 
-    console.log("Cleanup completed");
+    logger.info("Cleanup completed");
 
   } catch (error) {
 
-    console.error(
+    logger.error(
       "Video processing failed:"
     );
 
-    console.error(error);
+    logger.error(error);
   }
 };
 

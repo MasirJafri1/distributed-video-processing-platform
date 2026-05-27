@@ -17,6 +17,8 @@ const startWorker = async () => {
       const messages = await pollMessages();
 
       for (const message of messages) {
+        logger.info("Polling SQS queue...");
+        
         const s3Event = JSON.parse(message.Body);
 
         const record = s3Event.Records[0];
@@ -33,11 +35,26 @@ const startWorker = async () => {
           s3Key
         };
 
+        try {
+
         await processVideoJob(body);
 
         await deleteMessage(
           message.ReceiptHandle
         );
+
+        logger.info(
+          "Message processed successfully"
+        );
+
+      } catch (error) {
+
+        logger.error(error);
+
+        logger.error(
+          "Message processing failed"
+        );
+      }
 
         console.log(
           "Message deleted from queue"
