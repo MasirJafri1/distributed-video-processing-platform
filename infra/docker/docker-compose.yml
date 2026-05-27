@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   upload-service:
     build:
@@ -12,6 +10,9 @@ services:
 
     env_file:
       - ../../backend/upload-service/.env
+
+    environment:
+      DATABASE_URL: postgresql://admin:password@postgres:5432/video_platform
 
   nginx:
     image: nginx:latest
@@ -35,3 +36,24 @@ services:
 
     env_file:
       - ../../workers/transcoder-worker/.env
+    environment:
+      DATABASE_URL: postgresql://admin:password@postgres:5432/video_platform
+
+  postgres:
+    image: postgres:16
+
+    container_name: postgres
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: video_platform
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

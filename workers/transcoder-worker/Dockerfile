@@ -11,6 +11,8 @@ RUN npm install
 
 COPY . .
 
+RUN npx prisma generate
+
 RUN mkdir -p temp output
 
 CMD ["npm", "start"]

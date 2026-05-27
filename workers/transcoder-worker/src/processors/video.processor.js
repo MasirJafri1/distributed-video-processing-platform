@@ -19,6 +19,10 @@ const {
   generateHLS
 } = require("./hls.processor");
 
+const {
+  markVideoProcessed
+} = require("../services/video.service");
+
 const processVideoJob = async (job) => {
   try {
     console.log("Processing video:");
@@ -145,6 +149,18 @@ const processVideoJob = async (job) => {
     }
 
     console.log("HLS files uploaded");
+
+    await markVideoProcessed(
+    job.videoId,
+
+    `processed/${job.videoId}.mp4`,
+
+    `thumbnails/${job.videoId}.jpg`,
+
+    `hls/${job.videoId}/index.m3u8`
+  );
+
+  console.log("Database updated");
 
     const files =
       fs.readdirSync(outputDir);
