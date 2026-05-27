@@ -16,6 +16,23 @@ const createUploadUrl = async (req, res) => {
       });
     }
 
+    const allowedMimeTypes = [
+      "video/mp4",
+      "video/quicktime",
+      "video/x-msvideo"
+    ];
+
+    if (
+      !allowedMimeTypes.includes(
+        contentType
+      )
+    ) {
+      return res.status(400).json({
+        message:
+          "Unsupported file type"
+      });
+    }
+
     const data = await generateUploadUrl(
       fileName,
       contentType
