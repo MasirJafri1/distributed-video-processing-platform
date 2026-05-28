@@ -1,10 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-
-  binaryTargets = [
-    "native",
-    "linux-musl"
-  ]
 }
 
 datasource db {
@@ -26,4 +21,9 @@ model Video {
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model WebSocketConnection {
+  id          String   @id
+  connectedAt DateTime @default(now())
 }

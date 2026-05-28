@@ -44,8 +44,6 @@ services:
     build:
       context: ../../workers/transcoder-worker
 
-    container_name: transcoder-worker
-
     env_file:
       - ../../workers/transcoder-worker/.env
     environment:

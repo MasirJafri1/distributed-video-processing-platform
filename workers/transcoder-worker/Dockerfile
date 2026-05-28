@@ -11,11 +11,13 @@ COPY package*.json ./
 
 RUN npm ci
 
-COPY . .
+COPY prisma ./prisma
 
 ENV DATABASE_URL="postgresql://admin:password@postgres:5432/video_platform"
 
 RUN npx prisma generate
+
+COPY . .
 
 RUN mkdir -p temp output
 

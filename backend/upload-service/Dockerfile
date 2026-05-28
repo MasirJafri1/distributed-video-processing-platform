@@ -6,13 +6,17 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 
+RUN apk add --no-cache openssl
+
 RUN npm ci
 
-COPY . .
+COPY prisma ./prisma
 
 ENV DATABASE_URL="postgresql://admin:password@postgres:5432/video_platform"
 
 RUN npx prisma generate
+
+COPY . .
 
 EXPOSE 3000
 

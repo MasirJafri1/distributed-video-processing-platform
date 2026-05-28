@@ -8,6 +8,11 @@ import UploadBox from "./components/UploadBox";
 
 import VideoCard from "./components/VideoCard";
 
+import {
+  connectWebSocket,
+  disconnectWebSocket
+} from "@/services/websocket";
+
 export default function Home() {
 
   const [videos, setVideos] =
@@ -22,15 +27,13 @@ export default function Home() {
   };
 
   useEffect(() => {
+    connectWebSocket(() => {
+      fetchVideos();
+    });
 
-    fetchVideos();
-
-    const interval =
-      setInterval(fetchVideos, 15000);
-
-    return () =>
-      clearInterval(interval);
-
+    return () => {
+      disconnectWebSocket();
+    };
   }, []);
 
   return (

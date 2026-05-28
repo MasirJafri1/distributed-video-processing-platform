@@ -40,3 +40,11 @@ module "sqs" {
   project_name = var.project_name
   environment  = var.environment
 }
+
+module "websocket" {
+  source = "../../modules/websocket"
+
+  project_name = var.project_name
+
+  environment = var.environment
+}
