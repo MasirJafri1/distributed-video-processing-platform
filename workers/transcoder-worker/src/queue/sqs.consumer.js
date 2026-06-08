@@ -12,8 +12,7 @@ const pollMessages = async () => {
   const command = new ReceiveMessageCommand({
     QueueUrl: process.env.SQS_QUEUE_URL,
     MaxNumberOfMessages: 2,
-    WaitTimeSeconds: 20,
-    VisibilityTimeout: 300
+    WaitTimeSeconds: 20
   });
 
   const response = await sqsClient.send(command);

@@ -58,6 +58,10 @@ const startWorker = async () => {
               "Message processed successfully"
             );
 
+            console.log(
+              "Message deleted from queue"
+            );
+
           } catch (error) {
 
             logger.error(error);
@@ -66,10 +70,6 @@ const startWorker = async () => {
               "Message processing failed"
             );
           }
-
-          console.log(
-            "Message deleted from queue"
-          );
         })
       );
 

@@ -196,6 +196,7 @@ const processVideoJob = async (job) => {
   } catch (error) {
     logger.error("Video processing failed:");
     logger.error(error);
+    throw error;
   }
 };
 
