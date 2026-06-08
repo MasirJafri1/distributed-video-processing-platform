@@ -79,6 +79,11 @@ const processVideoJob = async (job) => {
     );
 
     fs.mkdirSync(
+      "/app/temp/480p",
+      { recursive: true }
+    );
+
+    fs.mkdirSync(
       "/app/temp/720p",
       { recursive: true }
     );
@@ -105,6 +110,13 @@ const processVideoJob = async (job) => {
 
     await createHlsVariant(
       inputPath,
+      "/app/temp/480p",
+      480,
+      "1400k"
+    );
+
+    await createHlsVariant(
+      inputPath,
       "/app/temp/720p",
       720,
       "2800k"
@@ -126,6 +138,11 @@ const processVideoJob = async (job) => {
     await uploadDirectory(
       "/app/temp/360p",
       `hls/${videoId}/360p`
+    );
+
+    await uploadDirectory(
+      "/app/temp/480p",
+      `hls/${videoId}/480p`
     );
 
     await uploadDirectory(
@@ -157,6 +174,9 @@ const processVideoJob = async (job) => {
     // Clean up local files
     if (fs.existsSync("/app/temp/360p")) {
       fs.rmSync("/app/temp/360p", { recursive: true, force: true });
+    }
+    if (fs.existsSync("/app/temp/480p")) {
+      fs.rmSync("/app/temp/480p", { recursive: true, force: true });
     }
     if (fs.existsSync("/app/temp/720p")) {
       fs.rmSync("/app/temp/720p", { recursive: true, force: true });

@@ -19,8 +19,13 @@ function createHlsVariant(
 
         .outputOptions([
           `-b:v ${bitrate}`,
+          "-preset veryfast",
+          "-profile:v main",
           "-hls_time 6",
-          "-hls_playlist_type vod"
+          "-hls_playlist_type vod",
+          "-hls_list_size 0",
+          "-sc_threshold 0",
+          `-hls_segment_filename ${outputDir}/segment_%03d.ts`
         ])
 
         .output(
