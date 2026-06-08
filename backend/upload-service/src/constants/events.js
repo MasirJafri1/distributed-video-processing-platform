@@ -1,0 +1,11 @@
+module.exports = {
+
+  VIDEO_COMPLETED:
+    "VIDEO_COMPLETED",
+
+  VIDEO_FAILED:
+    "VIDEO_FAILED",
+
+  VIDEO_PROCESSING:
+    "VIDEO_PROCESSING"
+};

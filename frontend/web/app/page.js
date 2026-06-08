@@ -28,7 +28,9 @@ export default function Home() {
 
   useEffect(() => {
     connectWebSocket(() => {
-      fetchVideos();
+      async () => {
+        await fetchVideos();
+      }
     });
 
     return () => {

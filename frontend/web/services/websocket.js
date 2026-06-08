@@ -1,38 +1,40 @@
-let socket = null;
+let socket;
 
-export const connectWebSocket =
-  (onMessage) => {
+export function connectWebSocket(
+  onMessage
+) {
 
-    socket = new WebSocket(
+  socket =
+    new WebSocket(
       process.env
         .NEXT_PUBLIC_WEBSOCKET_URL
     );
 
-    socket.onopen = () => {
-      console.log(
-        "WebSocket connected"
-      );
-    };
-
-    socket.onmessage = (event) => {
-
-      const data =
-        JSON.parse(event.data);
-
-      onMessage(data);
-    };
-
-    socket.onclose = () => {
-      console.log(
-        "WebSocket disconnected"
-      );
-    };
+  socket.onopen = () => {
+    console.log(
+      "connected"
+    );
   };
 
-export const disconnectWebSocket =
-  () => {
+  socket.onmessage =
+    (event) => {
 
-    if (socket) {
-      socket.close();
-    }
-  };
+      const payload =
+        JSON.parse(
+          event.data
+        );
+
+      if (
+        payload.type ===
+        "VIDEO_COMPLETED"
+      ) {
+        onMessage(payload);
+      }
+    };
+}
+
+export function disconnectWebSocket() {
+  if (socket) {
+    socket.close();
+  }
+}

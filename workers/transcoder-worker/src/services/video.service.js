@@ -6,7 +6,7 @@ const redisClient =
 const markVideoProcessed =
   async (
     videoId,
-    processedUrl,
+    masterPlaylistKey,
     thumbnailUrl,
     hlsUrl
   ) => {
@@ -19,8 +19,7 @@ const markVideoProcessed =
     data: {
       status: "PROCESSED",
 
-      processedVideoUrl:
-        processedUrl,
+      masterPlaylistKey,
 
       thumbnailUrl,
 

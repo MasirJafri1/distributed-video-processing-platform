@@ -26,11 +26,30 @@ const {
   markVideoProcessed
 } = require("../services/video.service");
 
+const {
+  notifyVideoCompleted
+} = require("../services/notification.service");
+
+const {
+  createHlsVariant
+} = require("../services/hls.service");
+
+const {
+  uploadDirectory
+} = require("../services/hls-upload.service");
+
+const {
+  generateMasterPlaylist
+} = require(
+  "../services/master-playlist.service"
+);
+
 const processVideoJob = async (job) => {
   try {
     logger.info("Processing video:");
-
     logger.info(job);
+
+    const videoId = job.videoId;
 
     const tempDir = path.join(
       __dirname,
@@ -54,14 +73,19 @@ const processVideoJob = async (job) => {
       });
     }
 
+    fs.mkdirSync(
+      "/app/temp/360p",
+      { recursive: true }
+    );
+
+    fs.mkdirSync(
+      "/app/temp/720p",
+      { recursive: true }
+    );
+
     const inputPath = path.join(
       tempDir,
       "input.mp4"
-    );
-
-    const outputVideoPath = path.join(
-      outputDir,
-      "output.mp4"
     );
 
     await downloadFile(
@@ -72,112 +96,73 @@ const processVideoJob = async (job) => {
 
     logger.info("Video downloaded");
 
-    await transcodeVideo(
+    await createHlsVariant(
       inputPath,
-      outputVideoPath
+      "/app/temp/360p",
+      360,
+      "800k"
     );
 
-    logger.info("Transcoding completed");
-
-    await generateHLS(
+    await createHlsVariant(
       inputPath,
-      outputDir
+      "/app/temp/720p",
+      720,
+      "2800k"
     );
 
-    logger.info("HLS generation completed");
+    logger.info("HLS variant generation completed");
 
-    await generateThumbnail(
-      inputPath,
-      outputDir
+    fs.mkdirSync(
+      "/app/temp/hls",
+      {
+        recursive: true
+      }
     );
 
-    logger.info("Thumbnail generated");
+    await generateMasterPlaylist(
+      "/app/temp/hls/master.m3u8"
+    );
+
+    await uploadDirectory(
+      "/app/temp/360p",
+      `hls/${videoId}/360p`
+    );
+
+    await uploadDirectory(
+      "/app/temp/720p",
+      `hls/${videoId}/720p`
+    );
 
     await uploadFile(
-      process.env.PROCESSED_BUCKET_NAME,
-      `processed/${job.videoId}.mp4`,
-      outputVideoPath,
-      "video/mp4"
+      "/app/temp/hls/master.m3u8",
+      `hls/${videoId}/master.m3u8`
     );
 
-    await uploadFile(
-      process.env.THUMBNAIL_BUCKET_NAME,
-      `thumbnails/${job.videoId}.jpg`,
-      path.join(
-        outputDir,
-        "thumbnail.jpg"
-      ),
-      "image/jpeg"
-    );
-
-    logger.info("Thumbnail uploaded");
-
-    const outputFiles =
-      fs.readdirSync(outputDir);
-
-    for (const file of outputFiles) {
-
-      const filePath = path.join(
-        outputDir,
-        file
-      );
-
-      if (file.endsWith(".m3u8")) {
-
-        await uploadFile(
-          process.env.PROCESSED_BUCKET_NAME,
-          `hls/${job.videoId}/${file}`,
-          filePath,
-          "application/vnd.apple.mpegurl"
-        );
-
-        logger.info(
-          `${file} uploaded`
-        );
-      }
-
-      if (file.endsWith(".ts")) {
-
-        await uploadFile(
-          process.env.PROCESSED_BUCKET_NAME,
-          `hls/${job.videoId}/${file}`,
-          filePath,
-          "video/mp2t"
-        );
-
-        logger.info(
-          `${file} uploaded`
-        );
-      }
-    }
-
-    logger.info("HLS files uploaded");
+    logger.info("HLS directories uploaded");
 
     await markVideoProcessed(
-    job.videoId,
+      videoId,
+      `hls/${videoId}/master.m3u8`,
+      null,
+      `hls/${videoId}/360p/index.m3u8`
+    );
 
-    `processed/${job.videoId}.mp4`,
+    logger.info("Database updated");
 
-    `thumbnails/${job.videoId}.jpg`,
+    await notifyVideoCompleted({
+      id: videoId,
+      status: "COMPLETED"
+    });
 
-    `hls/${job.videoId}/index.m3u8`
-  );
-
-  logger.info("Database updated");
-
-    const files =
-      fs.readdirSync(outputDir);
-
-    for (const file of files) {
-
-      const filePath = path.join(
-        outputDir,
-        file
-      );
-
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
+    // Clean up local files
+    if (fs.existsSync("/app/temp/360p")) {
+      fs.rmSync("/app/temp/360p", { recursive: true, force: true });
+    }
+    if (fs.existsSync("/app/temp/720p")) {
+      fs.rmSync("/app/temp/720p", { recursive: true, force: true });
+    }
+    if (fs.existsSync("/app/temp/hls")) {
+      fs.rmSync("/app/temp/hls", { recursive: true, force: true });
     }
 
     if (fs.existsSync(inputPath)) {
@@ -187,11 +172,7 @@ const processVideoJob = async (job) => {
     logger.info("Cleanup completed");
 
   } catch (error) {
-
-    logger.error(
-      "Video processing failed:"
-    );
-
+    logger.error("Video processing failed:");
     logger.error(error);
   }
 };

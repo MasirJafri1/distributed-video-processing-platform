@@ -14,6 +14,10 @@ const streamRoutes =
 const uploadRoutes = require("./routes/upload.routes");
 const videoRoutes =
   require("./routes/video.routes");
+const websocketRoutes =
+  require("./routes/websocket.routes");
+const eventRoutes =
+  require("./routes/events.routes");
 
 const app = express();
 
@@ -49,9 +53,11 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.use("/websocket",websocketRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/videos", videoRoutes);
 app.use("/stream", streamRoutes);
+app.use("/events",eventRoutes);
 
 app.use(errorMiddleware);
 
