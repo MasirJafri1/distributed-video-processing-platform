@@ -151,8 +151,10 @@ const processVideoJob = async (job) => {
     );
 
     await uploadFile(
+      process.env.PROCESSED_BUCKET_NAME,
+      `hls/${videoId}/master.m3u8`,
       "/app/temp/hls/master.m3u8",
-      `hls/${videoId}/master.m3u8`
+      "application/x-mpegURL"
     );
 
     logger.info("HLS directories uploaded");

@@ -25,9 +25,14 @@ async function uploadDirectory(
     of files
   ) {
 
+    const ext = path.extname(file);
+    const contentType = ext === ".m3u8" ? "application/x-mpegURL" : "video/MP2T";
+
     await uploadFile(
+      process.env.PROCESSED_BUCKET_NAME,
+      `${prefix}/${file}`,
       `${directory}/${file}`,
-      `${prefix}/${file}`
+      contentType
     );
   }
 }
