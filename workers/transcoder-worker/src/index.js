@@ -38,7 +38,7 @@ const startWorker = async () => {
 
           const fileName = s3Key.split("/").pop();
 
-          const videoId = fileName.split("-")[0];
+          const videoId = fileName.substring(0, 36);
 
           const body = {
             videoId,
