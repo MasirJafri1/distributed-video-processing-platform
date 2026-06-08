@@ -62,6 +62,12 @@ resource "aws_instance" "app_server" {
 
   associate_public_ip_address = true
 
+  root_block_device {
+    volume_size           = 30
+    volume_type           = "gp2"
+    delete_on_termination = true
+  }
+
   tags = {
     Name = "${var.project_name}-${var.environment}-server"
   }

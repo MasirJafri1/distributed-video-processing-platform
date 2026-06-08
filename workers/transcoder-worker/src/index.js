@@ -9,6 +9,8 @@ const {
   processVideoJob
 } = require("./processors/video.processor");
 
+const logger = require("./utils/logger");
+
 const startWorker = async () => {
   console.log("Worker started");
 
