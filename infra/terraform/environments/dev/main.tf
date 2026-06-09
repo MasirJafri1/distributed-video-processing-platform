@@ -48,3 +48,11 @@ module "websocket" {
 
   environment = var.environment
 }
+
+module "cloudfront" {
+  source = "../../modules/cloudfront"
+
+  processed_bucket_domain_name = module.s3.processed_bucket_domain_name
+  project_name                 = var.project_name
+  environment                  = var.environment
+}
