@@ -41,10 +41,11 @@ resource "aws_cloudfront_distribution" "video_cdn" {
       "GET",
       "HEAD"
     ]
-    target_origin_id       = "processed-videos-origin"
-    viewer_protocol_policy = "redirect-to-https"
-    compress               = true
-    trusted_key_groups     = [aws_cloudfront_key_group.key_group.id]
+    target_origin_id           = "processed-videos-origin"
+    viewer_protocol_policy     = "redirect-to-https"
+    compress                   = true
+    trusted_key_groups         = [aws_cloudfront_key_group.key_group.id]
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.cors_policy.id
 
     forwarded_values {
       query_string = false
@@ -72,5 +73,38 @@ resource "aws_cloudfront_distribution" "video_cdn" {
 
   tags = {
     Name = "${var.project_name}-${var.environment}-cdn"
+  }
+}
+
+resource "aws_cloudfront_response_headers_policy" "cors_policy" {
+  name    = "${var.project_name}-${var.environment}-cors-policy"
+  comment = "CORS policy for HLS playback with signed cookies"
+
+  cors_config {
+    access_control_allow_credentials = true
+
+    access_control_allow_headers {
+      items = [
+        "Origin",
+        "Accept",
+        "Content-Type",
+        "Authorization",
+        "Range",
+        "Access-Control-Allow-Origin"
+      ]
+    }
+
+    access_control_allow_methods {
+      items = ["GET", "HEAD", "OPTIONS"]
+    }
+
+    access_control_allow_origins {
+      items = [
+        "https://video-processing.masir-projects.me",
+        "https://video-processing-api.masir-projects.me"
+      ]
+    }
+
+    origin_override = true
   }
 }
