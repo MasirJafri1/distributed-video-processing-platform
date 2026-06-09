@@ -31,7 +31,8 @@ module "s3" {
   project_name = var.project_name
   environment  = var.environment
 
-  video_queue_arn = module.sqs.queue_arn
+  video_queue_arn             = module.sqs.queue_arn
+  cloudfront_distribution_arn = module.cloudfront.distribution_arn
 }
 
 module "sqs" {
