@@ -26,7 +26,8 @@ export default function VideoCard({
       {video.status === "PROCESSED" && (
         <div className="mt-4">
           <VideoPlayer
-            src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || "https://d37yeww5hdm8sc.cloudfront.net"}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`}
+            videoId={video.id}
+            src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`}
           />
         </div>
       )}

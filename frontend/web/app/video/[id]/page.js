@@ -45,7 +45,7 @@ export default async function Page({ params }) {
           {/* Player only shows if status is COMPLETED or PROCESSED */}
           {(video.status === "COMPLETED" || video.status === "PROCESSED") && (
             <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-inner border border-slate-800 mb-6 flex items-center justify-center">
-              <VideoPlayer src={video.playbackUrl || `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || "https://d37yeww5hdm8sc.cloudfront.net"}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`} />
+              <VideoPlayer videoId={video.id} src={video.playbackUrl || `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`} />
             </div>
           )}
 

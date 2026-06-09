@@ -20,6 +20,8 @@ const websocketRoutes =
   require("./routes/websocket.routes");
 const eventRoutes =
   require("./routes/events.routes");
+const playbackRoutes =
+  require("./routes/playback.routes");
 
 const app = express();
 
@@ -35,8 +37,8 @@ const limiter = rateLimit({
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
-
+    origin: true,
+    credentials: true,
     methods: [
       "GET",
       "POST",
@@ -58,6 +60,7 @@ app.get("/health", (req, res) => {
 app.use("/websocket",websocketRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/videos", videoRoutes);
+app.use("/videos", playbackRoutes);
 app.use("/stream", streamRoutes);
 app.use("/events",eventRoutes);
 

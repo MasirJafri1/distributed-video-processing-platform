@@ -2,6 +2,8 @@ resource "aws_s3_bucket" "raw_videos" {
   bucket = "${var.project_name}-${var.environment}-masir-raw-videos"
 }
 
+
+
 resource "aws_s3_bucket" "processed_videos" {
   bucket = "${var.project_name}-${var.environment}-masir-processed-videos"
 }

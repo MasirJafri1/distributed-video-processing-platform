@@ -31,19 +31,25 @@ export default function UploadBox({
 
       const {
         uploadUrl,
+        fields,
         videoId,
         key
       } = response.data;
 
-      await fetch(uploadUrl, {
-        method: "PUT",
-
-        headers: {
-          "Content-Type": file.type
-        },
-
-        body: file
+      const formData = new FormData();
+      Object.entries(fields).forEach(([k, v]) => {
+        formData.append(k, v);
       });
+      formData.append("file", file);
+
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        body: formData
+      });
+
+      if (!res.ok) {
+        throw new Error("S3 upload failed");
+      }
 
       onUploadComplete();
 

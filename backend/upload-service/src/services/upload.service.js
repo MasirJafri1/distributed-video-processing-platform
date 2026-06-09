@@ -1,6 +1,4 @@
-const { PutObjectCommand } = require("@aws-sdk/client-s3");
-
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { createPresignedPost } = require("@aws-sdk/s3-presigned-post");
 
 const { v4: uuidv4 } = require("uuid");
 
@@ -11,23 +9,23 @@ const generateUploadUrl = async (fileName, contentType) => {
 
   const key = `raw/${videoId}-${fileName}`;
 
-  const command = new PutObjectCommand({
+  const { url, fields } = await createPresignedPost(s3Client, {
     Bucket: process.env.RAW_BUCKET_NAME,
     Key: key,
-    ContentType: contentType
+    Conditions: [
+      ["content-length-range", 0, 524288000], // max 500MB
+      ["eq", "$Content-Type", contentType]
+    ],
+    Fields: {
+      "Content-Type": contentType
+    },
+    Expires: 3600
   });
-
-  const uploadUrl = await getSignedUrl(
-    s3Client,
-    command,
-    {
-      expiresIn: 3600
-    }
-  );
 
   return {
     videoId,
-    uploadUrl,
+    uploadUrl: url,
+    fields,
     key
   };
 };

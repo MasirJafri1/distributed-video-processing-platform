@@ -50,12 +50,27 @@ module "websocket" {
   environment = var.environment
 }
 
+module "acm" {
+  source = "../../modules/acm"
+
+  providers = {
+    aws = aws.us_east_1
+  }
+
+  cdn_domain_name = var.cdn_domain_name
+  project_name    = var.project_name
+  environment     = var.environment
+}
+
 module "cloudfront" {
   source = "../../modules/cloudfront"
 
   processed_bucket_domain_name = module.s3.processed_bucket_domain_name
   project_name                 = var.project_name
   environment                  = var.environment
+  cloudfront_public_key_pem    = file("${path.module}/../../../keys/cloudfront-public.pem")
+  acm_certificate_arn          = module.acm.certificate_arn
+  cdn_domain_name              = var.cdn_domain_name
 }
 
 resource "aws_cloudwatch_log_group" "container_logs" {
