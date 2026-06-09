@@ -7,23 +7,23 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY package*.json ./
-
-RUN npm ci
-
-COPY prisma ./prisma
-
-ENV DATABASE_URL="postgresql://admin:password@postgres:5432/video_platform"
-
-RUN npx prisma generate
-
-COPY . .
-
-RUN mkdir -p temp output
-
+# Create appuser first so we can copy files as this user
 RUN useradd -m appuser
 
-RUN chown -R appuser:appuser /app
+# Copy dependencies and install
+COPY --chown=appuser:appuser package*.json ./
+RUN npm ci
+
+# Generate Prisma client
+COPY --chown=appuser:appuser prisma ./prisma
+ENV DATABASE_URL="postgresql://admin:password@postgres:5432/video_platform"
+RUN npx prisma generate
+
+# Copy source files (excluding temp/ and output/ via .dockerignore)
+COPY --chown=appuser:appuser . .
+
+# Create empty temp and output folders and set correct ownership
+RUN mkdir -p temp output && chown -R appuser:appuser temp output
 
 USER appuser
 

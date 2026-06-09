@@ -4,25 +4,24 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY package*.json ./
+# Create appuser first so we can copy files as this user
+RUN adduser -D appuser
 
 RUN apk add --no-cache openssl
 
+# Copy dependencies and install
+COPY --chown=appuser:appuser package*.json ./
 RUN npm ci
 
-COPY prisma ./prisma
-
+# Generate Prisma client
+COPY --chown=appuser:appuser prisma ./prisma
 ENV DATABASE_URL="postgresql://admin:password@postgres:5432/video_platform"
-
 RUN npx prisma generate
 
-COPY . .
+# Copy source files
+COPY --chown=appuser:appuser . .
 
 EXPOSE 3000
-
-RUN adduser -D appuser
-
-RUN chown -R appuser:appuser /app
 
 USER appuser
 
