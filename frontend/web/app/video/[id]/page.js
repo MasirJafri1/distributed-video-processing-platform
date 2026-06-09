@@ -39,9 +39,9 @@ export default async function Page({ params }) {
 
         {/* Video Player Section */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-          {video.hlsMasterUrl ? (
+          {video.status === "PROCESSED" ? (
             <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-inner border border-slate-800 mb-6">
-              <VideoPlayer src={video.hlsMasterUrl} />
+              <VideoPlayer src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || "https://d37yeww5hdm8sc.cloudfront.net"}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`} />
             </div>
           ) : (
             <div className="aspect-video bg-slate-950 rounded-xl flex flex-col items-center justify-center border border-dashed border-slate-800 mb-6 p-8 text-center">

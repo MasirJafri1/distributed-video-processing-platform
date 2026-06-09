@@ -23,10 +23,10 @@ export default function VideoCard({
         />
       )}
 
-      {video.hlsMasterUrl && (
+      {video.status === "PROCESSED" && (
         <div className="mt-4">
           <VideoPlayer
-            src={video.hlsMasterUrl}
+            src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || "https://d37yeww5hdm8sc.cloudfront.net"}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`}
           />
         </div>
       )}
