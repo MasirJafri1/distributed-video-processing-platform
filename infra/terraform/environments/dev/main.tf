@@ -66,6 +66,7 @@ module "cloudfront" {
   source = "../../modules/cloudfront"
 
   processed_bucket_domain_name = module.s3.processed_bucket_domain_name
+  thumbnails_bucket_domain_name = module.s3.thumbnails_bucket_domain_name
   project_name                 = var.project_name
   environment                  = var.environment
   cloudfront_public_key_pem    = file("${path.module}/../../../keys/cloudfront-public.pem")

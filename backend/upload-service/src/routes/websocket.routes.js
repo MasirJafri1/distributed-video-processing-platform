@@ -14,7 +14,7 @@ const router =
 router.post(
   "/connect",
   async (req, res) => {
-    const connectionId = req.body.connectionId || req.body.requestContext?.connectionId;
+    const connectionId = req.body.connectionId || req.body.requestContext?.connectionId || req.headers["x-connection-id"];
 
     if (!connectionId) {
       return res.status(400).json({ error: "connectionId is required" });
@@ -31,7 +31,7 @@ router.post(
 router.post(
   "/disconnect",
   async (req, res) => {
-    const connectionId = req.body.connectionId || req.body.requestContext?.connectionId;
+    const connectionId = req.body.connectionId || req.body.requestContext?.connectionId || req.headers["x-connection-id"];
 
     if (!connectionId) {
       return res.status(400).json({ error: "connectionId is required" });

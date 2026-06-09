@@ -18,6 +18,10 @@ resource "aws_apigatewayv2_integration" "connect_integration" {
   integration_type   = "HTTP_PROXY"
   integration_uri    = "https://video-processing-api.masir-projects.me/websocket/connect"
   integration_method = "POST"
+
+  request_parameters = {
+    "integration.request.header.x-connection-id" = "context.connectionId"
+  }
 }
 
 resource "aws_apigatewayv2_route" "connect_route" {
@@ -31,6 +35,10 @@ resource "aws_apigatewayv2_integration" "disconnect_integration" {
   integration_type   = "HTTP_PROXY"
   integration_uri    = "https://video-processing-api.masir-projects.me/websocket/disconnect"
   integration_method = "POST"
+
+  request_parameters = {
+    "integration.request.header.x-connection-id" = "context.connectionId"
+  }
 }
 
 resource "aws_apigatewayv2_route" "disconnect_route" {

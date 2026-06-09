@@ -32,6 +32,12 @@ resource "aws_cloudfront_distribution" "video_cdn" {
     origin_access_control_id = aws_cloudfront_origin_access_control.processed_bucket_oac.id
   }
 
+  origin {
+    domain_name              = var.thumbnails_bucket_domain_name
+    origin_id                = "thumbnails-origin"
+    origin_access_control_id = aws_cloudfront_origin_access_control.processed_bucket_oac.id
+  }
+
   default_cache_behavior {
     allowed_methods = [
       "GET",
@@ -55,6 +61,25 @@ resource "aws_cloudfront_distribution" "video_cdn" {
         whitelisted_names = ["CloudFront-Policy", "CloudFront-Signature", "CloudFront-Key-Pair-Id"]
       }
     }
+  }
+
+  ordered_cache_behavior {
+    path_pattern     = "thumbnails/*"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "thumbnails-origin"
+
+    forwarded_values {
+      query_string = false
+      headers      = ["Origin"]
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy     = "redirect-to-https"
+    compress                   = true
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.cors_policy.id
   }
 
   restrictions {
