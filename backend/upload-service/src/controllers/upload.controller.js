@@ -1,3 +1,4 @@
+const logger = require("../utils/logger");
 const {
   generateUploadUrl
 } = require("../services/upload.service");
@@ -48,7 +49,7 @@ const createUploadUrl = async (req, res) => {
     return res.status(200).json(data);
 
   } catch (error) {
-    console.error(error);
+    logger.error(error);
 
     return res.status(500).json({
       message: "Failed to generate upload URL"

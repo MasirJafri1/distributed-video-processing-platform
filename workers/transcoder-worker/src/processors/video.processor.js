@@ -46,6 +46,7 @@ const {
 
 const processVideoJob = async (job) => {
   try {
+    const start = Date.now();
     logger.info("Processing video:");
     logger.info(job);
 
@@ -215,11 +216,19 @@ const processVideoJob = async (job) => {
       fs.unlinkSync(inputPath);
     }
 
+    const duration = Date.now() - start;
+    logger.info({
+      videoId,
+      duration
+    }, "Processing completed");
+
     logger.info("Cleanup completed");
 
   } catch (error) {
-    logger.error("Video processing failed:");
-    logger.error(error);
+    logger.error({
+      videoId: job.videoId,
+      error: error.message
+    }, "Video processing failed");
     throw error;
   }
 };

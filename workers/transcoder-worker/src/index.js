@@ -12,7 +12,7 @@ const {
 const logger = require("./utils/logger");
 
 const startWorker = async () => {
-  console.log("Worker started");
+  logger.info("Worker started");
 
   while (true) {
     try {
@@ -58,7 +58,7 @@ const startWorker = async () => {
               "Message processed successfully"
             );
 
-            console.log(
+            logger.info(
               "Message deleted from queue"
             );
 
@@ -74,7 +74,7 @@ const startWorker = async () => {
       );
 
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 };

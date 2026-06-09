@@ -1,3 +1,4 @@
+const logger = require("../utils/logger");
 const {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand
@@ -45,7 +46,7 @@ async function broadcast(
 
     } catch (error) {
 
-      console.error(
+      logger.error(
         error
       );
     }

@@ -9,3 +9,7 @@ output "queue_name" {
 output "queue_arn" {
   value = aws_sqs_queue.video_processing_queue.arn
 }
+
+output "dlq_name" {
+  value = aws_sqs_queue.dead_letter_queue.name
+}
