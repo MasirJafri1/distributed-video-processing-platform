@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import Link from "next/link";
 import api from "@/services/api";
 
 import UploadBox from "./components/UploadBox";
@@ -54,10 +54,11 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
 
         {videos.map((video) => (
-          <VideoCard
-            key={video.id}
-            video={video}
-          />
+          <Link href={`/video/${video.id}`} key={video.id} className="block hover:scale-[1.01] hover:shadow-lg transition-all duration-200">
+            <VideoCard
+              video={video}
+            />
+          </Link>
         ))}
 
       </div>

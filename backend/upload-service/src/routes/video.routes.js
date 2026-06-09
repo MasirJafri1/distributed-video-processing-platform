@@ -38,4 +38,20 @@ router.get("/", async (req, res) => {
   res.json(videos);
 });
 
+router.get("/:id", async (req, res) => {
+  const video = await prisma.video.findUnique({
+    where: {
+      id: req.params.id
+    }
+  });
+
+  if (!video) {
+    return res.status(404).json({
+      message: "Video not found"
+    });
+  }
+
+  res.json(video);
+});
+
 module.exports = router;
