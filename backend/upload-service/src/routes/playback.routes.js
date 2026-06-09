@@ -38,13 +38,13 @@ router.get("/:id/playback-cookies", async (req, res) => {
     const cookies = generatePlaybackCookies(id);
     const cloudfrontDomain = process.env.CLOUDFRONT_DOMAIN;
 
-    // Set each signed cookie as a Set-Cookie header
-    // Domain is the CloudFront domain so cookies are sent with CDN requests
+    const cookieDomain = process.env.COOKIE_DOMAIN || ".masir-projects.me";
     const cookieOptions = [
       `Path=/`,
       `Secure`,
       `SameSite=None`,
-      `Max-Age=7200`
+      `Max-Age=7200`,
+      `Domain=${cookieDomain}`
     ].join("; ");
 
     const cookieHeaders = Object.entries(cookies).map(
