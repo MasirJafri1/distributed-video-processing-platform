@@ -5,8 +5,7 @@ import Link from "next/link";
 import api from "@/services/api";
 
 import UploadBox from "./components/UploadBox";
-
-import VideoCard from "./components/VideoCard";
+import VideoCard from "@/components/VideoCard";
 
 import {
   connectWebSocket,
@@ -51,16 +50,13 @@ export default function Home() {
         }
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-
+      <div className="grid gap-6 mt-10" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
         {videos.map((video) => (
-          <Link href={`/video/${video.id}`} key={video.id} className="block hover:scale-[1.01] hover:shadow-lg transition-all duration-200">
-            <VideoCard
-              video={video}
-            />
-          </Link>
+          <VideoCard
+            key={video.id}
+            video={video}
+          />
         ))}
-
       </div>
     </main>
   );

@@ -8,7 +8,8 @@ const markVideoProcessed =
     videoId,
     masterPlaylistKey,
     thumbnailUrl,
-    hlsUrl
+    hlsUrl,
+    thumbnailKey
   ) => {
 
   const updatedVideo = await prisma.video.update({
@@ -17,13 +18,15 @@ const markVideoProcessed =
     },
 
     data: {
-      status: "PROCESSED",
+      status: "COMPLETED",
 
       masterPlaylistKey,
 
       thumbnailUrl,
 
-      hlsMasterUrl: hlsUrl
+      hlsMasterUrl: hlsUrl,
+
+      thumbnailKey
     }
   });
 

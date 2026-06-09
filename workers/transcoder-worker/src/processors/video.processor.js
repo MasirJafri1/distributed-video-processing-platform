@@ -12,7 +12,7 @@ const {
 
 const {
   generateThumbnail
-} = require("./thumbnail.processor");
+} = require("../services/thumbnail.service");
 
 const {
   transcodeVideo
@@ -88,6 +88,11 @@ const processVideoJob = async (job) => {
       { recursive: true }
     );
 
+    fs.mkdirSync(
+      "/app/temp/thumbnails",
+      { recursive: true }
+    );
+
     const inputPath = path.join(
       tempDir,
       "input.mp4"
@@ -100,6 +105,21 @@ const processVideoJob = async (job) => {
     );
 
     logger.info("Video downloaded");
+
+    logger.info("Generating thumbnail");
+    await generateThumbnail(
+      inputPath,
+      "/app/temp/thumbnails"
+    );
+
+    logger.info("Uploading thumbnail");
+    const thumbnailKey = `thumbnails/${videoId}.jpg`;
+    await uploadFile(
+      process.env.THUMBNAIL_BUCKET_NAME || process.env.PROCESSED_BUCKET_NAME,
+      thumbnailKey,
+      "/app/temp/thumbnails/thumbnail.jpg",
+      "image/jpeg"
+    );
 
     await createHlsVariant(
       inputPath,
@@ -163,7 +183,8 @@ const processVideoJob = async (job) => {
       videoId,
       `hls/${videoId}/master.m3u8`,
       null,
-      `hls/${videoId}/360p/index.m3u8`
+      `hls/${videoId}/360p/index.m3u8`,
+      thumbnailKey
     );
 
     logger.info("Database updated");
@@ -185,6 +206,9 @@ const processVideoJob = async (job) => {
     }
     if (fs.existsSync("/app/temp/hls")) {
       fs.rmSync("/app/temp/hls", { recursive: true, force: true });
+    }
+    if (fs.existsSync("/app/temp/thumbnails")) {
+      fs.rmSync("/app/temp/thumbnails", { recursive: true, force: true });
     }
 
     if (fs.existsSync(inputPath)) {

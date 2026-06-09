@@ -20,6 +20,7 @@ model Video {
   processedVideoUrl String?
   hlsMasterUrl      String?
   masterPlaylistKey String?
+  thumbnailKey      String?
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

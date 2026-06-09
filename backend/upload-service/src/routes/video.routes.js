@@ -27,15 +27,22 @@ router.get("/", async (req, res) => {
       }
     });
 
+  const mappedVideos = videos.map(video => ({
+    ...video,
+    thumbnailUrl: video.thumbnailKey
+      ? `https://${process.env.CLOUDFRONT_DOMAIN}/${video.thumbnailKey}`
+      : null
+  }));
+
   await redisClient.set(
     "videos",
-    JSON.stringify(videos),
+    JSON.stringify(mappedVideos),
     {
       EX: 60
     }
   );
 
-  res.json(videos);
+  res.json(mappedVideos);
 });
 
 router.get("/:id", async (req, res) => {
@@ -53,7 +60,10 @@ router.get("/:id", async (req, res) => {
 
   res.json({
     ...video,
-    playbackUrl: `https://${process.env.CLOUDFRONT_DOMAIN}/${video.masterPlaylistKey}`
+    playbackUrl: `https://${process.env.CLOUDFRONT_DOMAIN}/${video.masterPlaylistKey}`,
+    thumbnailUrl: video.thumbnailKey
+      ? `https://${process.env.CLOUDFRONT_DOMAIN}/${video.thumbnailKey}`
+      : null
   });
 });
 

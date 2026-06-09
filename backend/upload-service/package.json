@@ -4,7 +4,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "npx prisma migrate deploy && node src/index.js"
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.1062.0",
