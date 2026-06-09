@@ -51,7 +51,10 @@ router.get("/:id", async (req, res) => {
     });
   }
 
-  res.json(video);
+  res.json({
+    ...video,
+    playbackUrl: `https://${process.env.CLOUDFRONT_DOMAIN}/${video.masterPlaylistKey}`
+  });
 });
 
 module.exports = router;

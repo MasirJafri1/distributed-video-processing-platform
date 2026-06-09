@@ -1,5 +1,5 @@
 import { getVideo } from "@/services/video.service";
-import VideoPlayer from "@/app/components/VideoPlayer";
+import VideoPlayer from "@/components/VideoPlayer";
 import Link from "next/link";
 
 export default async function Page({ params }) {
@@ -20,6 +20,8 @@ export default async function Page({ params }) {
   const statusColors = {
     PENDING: "bg-amber-500/10 text-amber-500 border-amber-500/20",
     PROCESSING: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    UPLOADED: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    PROCESSED: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
     COMPLETED: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
     FAILED: "bg-rose-500/10 text-rose-500 border-rose-500/20",
   };
@@ -39,11 +41,16 @@ export default async function Page({ params }) {
 
         {/* Video Player Section */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
-          {video.status === "PROCESSED" ? (
-            <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-inner border border-slate-800 mb-6">
-              <VideoPlayer src={`${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || "https://d37yeww5hdm8sc.cloudfront.net"}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`} />
+          
+          {/* Player only shows if status is COMPLETED or PROCESSED */}
+          {(video.status === "COMPLETED" || video.status === "PROCESSED") && (
+            <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-inner border border-slate-800 mb-6 flex items-center justify-center">
+              <VideoPlayer src={video.playbackUrl || `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || "https://d37yeww5hdm8sc.cloudfront.net"}/${video.masterPlaylistKey || `hls/${video.id}/master.m3u8`}`} />
             </div>
-          ) : (
+          )}
+
+          {/* Processing UI placeholder if not ready */}
+          {video.status !== "COMPLETED" && video.status !== "PROCESSED" && (
             <div className="aspect-video bg-slate-950 rounded-xl flex flex-col items-center justify-center border border-dashed border-slate-800 mb-6 p-8 text-center">
               {video.status === "FAILED" ? (
                 <div className="text-rose-500 text-lg font-semibold mb-2">Processing Failed</div>
@@ -64,9 +71,18 @@ export default async function Page({ params }) {
             </div>
             
             <div className="flex items-center gap-3">
-              <span className={`px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border ${currentStatusColor}`}>
-                {video.status}
-              </span>
+              {/* Custom processing state UI block */}
+              <div className={`px-4 py-2 rounded-xl border ${currentStatusColor} font-medium text-sm`}>
+                {(video.status === "PROCESSING" || video.status === "UPLOADED") && (
+                  <p>Processing...</p>
+                )}
+                {(video.status === "COMPLETED" || video.status === "PROCESSED") && (
+                  <p>Ready</p>
+                )}
+                {video.status === "FAILED" && (
+                  <p>Failed</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
