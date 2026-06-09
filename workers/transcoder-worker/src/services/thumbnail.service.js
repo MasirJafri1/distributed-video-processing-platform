@@ -4,7 +4,7 @@ function generateThumbnail(inputPath, outputPath) {
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
       .screenshots({
-        timestamps: ["5"],
+        timestamps: ["10%"],
         filename: "thumbnail.jpg",
         folder: outputPath,
         size: "640x360"
