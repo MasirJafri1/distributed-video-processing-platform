@@ -11,7 +11,7 @@ RUN apk add --no-cache openssl
 
 # Copy dependencies and install
 COPY --chown=appuser:appuser package*.json ./
-RUN npm ci
+RUN npm install
 
 # Generate Prisma client
 COPY --chown=appuser:appuser prisma ./prisma
