@@ -7,11 +7,13 @@ import PipelineStatusTracker from "./PipelineStatusTracker";
 import VideoMetadata from "./VideoMetadata";
 import CreatorBanner from "./CreatorBanner";
 import StatsForNerds from "./StatsForNerds";
+import ManifestInspector from "./ManifestInspector";
 
 export default function VideoDetailLayout({ video }) {
   const [logs, setLogs] = useState([]);
   const [showNerdStats, setShowNerdStats] = useState(false);
   const [nerdStats, setNerdStats] = useState(null);
+  const [showS3Inspector, setShowS3Inspector] = useState(false);
 
   const handleHlsLog = (log) => {
     setLogs((prev) => [...prev, log].slice(-100)); // limit log history
@@ -46,7 +48,34 @@ export default function VideoDetailLayout({ video }) {
                   onStatsUpdate={handleStatsUpdate}
                 />
               </div>
-              <div className="flex justify-end px-1">
+              <div className="flex justify-end gap-2 px-1">
+                <button
+                  id="s3-inspector-toggle-btn"
+                  onClick={() => setShowS3Inspector((prev) => !prev)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold rounded-xl border transition-all cursor-pointer shadow-sm ${
+                    showS3Inspector
+                      ? "bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800"
+                      : "bg-white border-zinc-200 text-zinc-600 hover:text-black hover:border-zinc-300"
+                  }`}
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                    />
+                  </svg>
+                  {showS3Inspector
+                    ? "Hide S3 Inspector"
+                    : "S3 Manifest Inspector"}
+                </button>
+
                 <button
                   id="nerd-stats-toggle-btn"
                   onClick={() => setShowNerdStats((prev) => !prev)}
@@ -122,6 +151,11 @@ export default function VideoDetailLayout({ video }) {
 
         {/* Live Playback Analytics ("Stats for Nerds") */}
         {showNerdStats && isReady && <StatsForNerds stats={nerdStats} />}
+
+        {/* S3 HLS Manifest Inspector */}
+        {showS3Inspector && isReady && (
+          <ManifestInspector videoSrc={videoSrc} video={video} />
+        )}
 
         {/* Visual Pipeline Status Tracker */}
         <PipelineStatusTracker status={video.status} />

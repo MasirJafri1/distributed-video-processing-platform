@@ -93,7 +93,7 @@ export default function useVideoUploads() {
           console.error(`Failed to poll status for video ${up.videoId}:`, err);
         }
       }
-    }, 4000); // check status every 4 seconds
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [uploads]);
