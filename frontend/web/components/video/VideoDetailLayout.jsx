@@ -6,12 +6,19 @@ import HlsDebuggerConsole from "./HlsDebuggerConsole";
 import PipelineStatusTracker from "./PipelineStatusTracker";
 import VideoMetadata from "./VideoMetadata";
 import CreatorBanner from "./CreatorBanner";
+import StatsForNerds from "./StatsForNerds";
 
 export default function VideoDetailLayout({ video }) {
   const [logs, setLogs] = useState([]);
+  const [showNerdStats, setShowNerdStats] = useState(false);
+  const [nerdStats, setNerdStats] = useState(null);
 
   const handleHlsLog = (log) => {
     setLogs((prev) => [...prev, log].slice(-100)); // limit log history
+  };
+
+  const handleStatsUpdate = (stats) => {
+    setNerdStats(stats);
   };
 
   const isReady = video.status === "COMPLETED" || video.status === "PROCESSED";
@@ -30,12 +37,43 @@ export default function VideoDetailLayout({ video }) {
         {/* Player Container Box */}
         <div className="overflow-hidden bg-white border border-zinc-200 rounded-3xl shadow-sm p-4">
           {isReady ? (
-            <div className="aspect-video bg-black rounded-2xl overflow-hidden border border-zinc-950 flex items-center justify-center">
-              <VideoPlayer
-                videoId={video.id}
-                src={videoSrc}
-                onHlsLog={handleHlsLog}
-              />
+            <div className="space-y-4">
+              <div className="aspect-video bg-black rounded-2xl overflow-hidden border border-zinc-950 flex items-center justify-center">
+                <VideoPlayer
+                  videoId={video.id}
+                  src={videoSrc}
+                  onHlsLog={handleHlsLog}
+                  onStatsUpdate={handleStatsUpdate}
+                />
+              </div>
+              <div className="flex justify-end px-1">
+                <button
+                  id="nerd-stats-toggle-btn"
+                  onClick={() => setShowNerdStats((prev) => !prev)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold rounded-xl border transition-all cursor-pointer shadow-sm ${
+                    showNerdStats
+                      ? "bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800"
+                      : "bg-white border-zinc-200 text-zinc-600 hover:text-black hover:border-zinc-300"
+                  }`}
+                >
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"
+                    />
+                  </svg>
+                  {showNerdStats
+                    ? "Hide Stats for Nerds"
+                    : "Show Stats for Nerds"}
+                </button>
+              </div>
             </div>
           ) : (
             <div className="aspect-video bg-zinc-50 border border-dashed border-zinc-200 rounded-2xl flex flex-col items-center justify-center p-8 text-center">
@@ -81,6 +119,9 @@ export default function VideoDetailLayout({ video }) {
             </div>
           )}
         </div>
+
+        {/* Live Playback Analytics ("Stats for Nerds") */}
+        {showNerdStats && isReady && <StatsForNerds stats={nerdStats} />}
 
         {/* Visual Pipeline Status Tracker */}
         <PipelineStatusTracker status={video.status} />

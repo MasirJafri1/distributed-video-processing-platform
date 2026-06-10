@@ -3,13 +3,19 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 
-export default function VideoPlayer({ src, videoId, onHlsLog }) {
+export default function VideoPlayer({ src, videoId, onHlsLog, onStatsUpdate }) {
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
+  const totalBytesRef = useRef(0);
   const [cookiesReady, setCookiesReady] = useState(false);
   const [error, setError] = useState(null);
   const [levels, setLevels] = useState([]);
   const [currentLevel, setCurrentLevel] = useState(-1); // -1 is Auto
+
+  // Reset total bytes when source changes
+  useEffect(() => {
+    totalBytesRef.current = 0;
+  }, [src]);
 
   // Step 1: Fetch playback cookies from the backend before loading HLS
   useEffect(() => {
@@ -76,6 +82,10 @@ export default function VideoPlayer({ src, videoId, onHlsLog }) {
       hls.on(Hls.Events.FRAG_LOADED, (event, data) => {
         const frag = data.frag;
         const stats = data.stats;
+
+        // Accumulate bytes downloaded in ref to avoid triggering React re-renders on every fragment
+        totalBytesRef.current += stats.total;
+
         const sizeMB = (stats.total / (1024 * 1024)).toFixed(2);
         const loadDurationMs = stats.loading.duration.toFixed(0);
         const levelName =
@@ -141,6 +151,61 @@ export default function VideoPlayer({ src, videoId, onHlsLog }) {
       onHlsLog?.(log);
     }
   }, [src, cookiesReady]);
+
+  // Step 3: Throttled telemetry tick for "Stats for Nerds" without lagging
+  useEffect(() => {
+    if (!cookiesReady || !onStatsUpdate) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    const interval = setInterval(() => {
+      if (!videoRef.current) return;
+      const v = videoRef.current;
+
+      // Calculate buffer health
+      let bufferHealth = 0;
+      const time = v.currentTime;
+      const buffered = v.buffered;
+      for (let i = 0; i < buffered.length; i++) {
+        const start = buffered.start(i);
+        const end = buffered.end(i);
+        if (time >= start && time <= end) {
+          bufferHealth = end - time;
+          break;
+        }
+      }
+
+      // Get current quality level info
+      let currentBitrate = 0;
+      let currentResolution = "Auto";
+      const hls = hlsRef.current;
+
+      if (hls) {
+        if (hls.currentLevel !== -1 && hls.levels[hls.currentLevel]) {
+          currentBitrate = hls.levels[hls.currentLevel].bitrate;
+          currentResolution = `${hls.levels[hls.currentLevel].height}p`;
+        } else if (hls.levels && hls.levels.length > 0) {
+          const activeLevel =
+            hls.loadLevel !== -1 ? hls.loadLevel : hls.nextLoadLevel;
+          if (activeLevel !== -1 && hls.levels[activeLevel]) {
+            currentBitrate = hls.levels[activeLevel].bitrate;
+            currentResolution = `${hls.levels[activeLevel].height}p (Auto)`;
+          }
+        }
+      }
+
+      onStatsUpdate({
+        bitrate: currentBitrate,
+        resolution: currentResolution,
+        bufferHealth: Number(bufferHealth.toFixed(2)),
+        hlsBytesDownloaded: totalBytesRef.current,
+        duration: v.duration || 0,
+      });
+    }, 1000); // Throttled to 1-second ticks to completely avoid any frontend performance lag
+
+    return () => clearInterval(interval);
+  }, [cookiesReady, onStatsUpdate]);
 
   const changeQuality = (levelIndex) => {
     if (!hlsRef.current) return;
