@@ -1,25 +1,30 @@
-const { getSignedCookies } = require("@aws-sdk/cloudfront-signer");
-const fs = require("fs");
-const path = require("path");
-const logger = require("../utils/logger");
+import { getSignedCookies } from "@aws-sdk/cloudfront-signer";
+import fs from "fs";
+import path from "path";
+import logger from "../utils/logger.js";
 
 // Load private key — supports both file path and inline PEM via env var
 let privateKey;
 if (process.env.CLOUDFRONT_PRIVATE_KEY_PATH) {
   privateKey = fs.readFileSync(
     path.resolve(process.env.CLOUDFRONT_PRIVATE_KEY_PATH),
-    "utf8"
+    "utf8",
   );
 } else if (process.env.CLOUDFRONT_PRIVATE_KEY) {
   // For Docker / CI: inline PEM stored as env var (newlines as \n)
   privateKey = process.env.CLOUDFRONT_PRIVATE_KEY.replace(/\\n/g, "\n");
 } else {
-  logger.warn("No CloudFront private key configured — signed cookies will not work");
+  logger.warn(
+    "No CloudFront private key configured — signed cookies will not work",
+  );
 }
 
 const CLOUDFRONT_DOMAIN = process.env.CLOUDFRONT_DOMAIN;
 const KEY_PAIR_ID = process.env.CLOUDFRONT_KEY_PAIR_ID;
-const COOKIE_EXPIRY_HOURS = parseInt(process.env.COOKIE_EXPIRY_HOURS || "2", 10);
+const COOKIE_EXPIRY_HOURS = parseInt(
+  process.env.COOKIE_EXPIRY_HOURS || "2",
+  10,
+);
 
 /**
  * Generate CloudFront signed cookies for a specific video's HLS assets.
@@ -35,7 +40,7 @@ const generatePlaybackCookies = (videoId) => {
 
   const resourceUrl = `https://${CLOUDFRONT_DOMAIN}/hls/${videoId}/*`;
   const dateLessThan = new Date(
-    Date.now() + COOKIE_EXPIRY_HOURS * 60 * 60 * 1000
+    Date.now() + COOKIE_EXPIRY_HOURS * 60 * 60 * 1000,
   ).toISOString();
 
   const cookies = getSignedCookies({
@@ -48,18 +53,16 @@ const generatePlaybackCookies = (videoId) => {
           Condition: {
             DateLessThan: {
               "AWS:EpochTime": Math.floor(
-                new Date(dateLessThan).getTime() / 1000
-              )
-            }
-          }
-        }
-      ]
-    })
+                new Date(dateLessThan).getTime() / 1000,
+              ),
+            },
+          },
+        },
+      ],
+    }),
   });
 
   return cookies;
 };
 
-module.exports = {
-  generatePlaybackCookies
-};
+export { generatePlaybackCookies };

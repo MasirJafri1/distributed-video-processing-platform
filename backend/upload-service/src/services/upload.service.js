@@ -1,10 +1,8 @@
-const { createPresignedPost } = require("@aws-sdk/s3-presigned-post");
+import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
+import { v4 as uuidv4 } from "uuid";
+import { s3Client } from "../config/aws.js";
 
-const { v4: uuidv4 } = require("uuid");
-
-const { s3Client } = require("../config/aws");
-
-const generateUploadUrl = async (fileName, contentType) => {
+export const generateUploadUrl = async (fileName, contentType) => {
   const videoId = uuidv4();
 
   const key = `raw/${videoId}-${fileName}`;
@@ -14,22 +12,18 @@ const generateUploadUrl = async (fileName, contentType) => {
     Key: key,
     Conditions: [
       ["content-length-range", 0, 524288000], // max 500MB
-      ["eq", "$Content-Type", contentType]
+      ["eq", "$Content-Type", contentType],
     ],
     Fields: {
-      "Content-Type": contentType
+      "Content-Type": contentType,
     },
-    Expires: 3600
+    Expires: 3600,
   });
 
   return {
     videoId,
     uploadUrl: url,
     fields,
-    key
+    key,
   };
-};
-
-module.exports = {
-  generateUploadUrl
 };

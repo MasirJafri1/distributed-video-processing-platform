@@ -1,14 +1,6 @@
-const { z } = require("zod");
+import { z } from "zod";
 
-const uploadSchema = z.object({
-
-  fileName:
-    z.string().min(1),
-
-  contentType:
-    z.string().min(1)
+export const uploadSchema = z.object({
+  fileName: z.string().min(1),
+  contentType: z.string().min(1),
 });
-
-module.exports = {
-  uploadSchema
-};

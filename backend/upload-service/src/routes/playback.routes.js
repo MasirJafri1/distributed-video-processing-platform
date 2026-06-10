@@ -1,9 +1,7 @@
-const express = require("express");
-const logger = require("../utils/logger");
-const prisma = require("../db/prisma");
-const {
-  generatePlaybackCookies
-} = require("../services/cookie.service");
+import express from "express";
+import logger from "../utils/logger.js";
+import prisma from "../db/prisma.js";
+import { generatePlaybackCookies } from "../services/cookie.service.js";
 
 const router = express.Router();
 
@@ -20,18 +18,18 @@ router.get("/:id/playback-cookies", async (req, res) => {
 
     // Verify video exists and is playable
     const video = await prisma.video.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!video) {
       return res.status(404).json({
-        message: "Video not found"
+        message: "Video not found",
       });
     }
 
     if (video.status !== "COMPLETED" && video.status !== "PROCESSED") {
       return res.status(400).json({
-        message: "Video is not ready for playback"
+        message: "Video is not ready for playback",
       });
     }
 
@@ -44,11 +42,11 @@ router.get("/:id/playback-cookies", async (req, res) => {
       `Secure`,
       `SameSite=None`,
       `Max-Age=7200`,
-      `Domain=${cookieDomain}`
+      `Domain=${cookieDomain}`,
     ].join("; ");
 
     const cookieHeaders = Object.entries(cookies).map(
-      ([name, value]) => `${name}=${value}; ${cookieOptions}`
+      ([name, value]) => `${name}=${value}; ${cookieOptions}`,
     );
 
     res.setHeader("Set-Cookie", cookieHeaders);
@@ -58,14 +56,14 @@ router.get("/:id/playback-cookies", async (req, res) => {
     return res.status(200).json({
       message: "Cookies set",
       cloudfrontDomain,
-      videoId: id
+      videoId: id,
     });
   } catch (error) {
     logger.error(error, "Failed to generate playback cookies");
     return res.status(500).json({
-      message: "Failed to generate playback cookies"
+      message: "Failed to generate playback cookies",
     });
   }
 });
 
-module.exports = router;
+export default router;

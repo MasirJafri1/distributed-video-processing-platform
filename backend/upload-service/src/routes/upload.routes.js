@@ -1,14 +1,8 @@
-const express = require("express");
-
-const {
-  createUploadUrl
-} = require("../controllers/upload.controller");
+import express from "express";
+import { createUploadUrl } from "../controllers/upload.controller.js";
 
 const router = express.Router();
 
-router.post(
-  "/presigned-url",
-  createUploadUrl
-);
+router.post("/presigned-url", createUploadUrl);
 
-module.exports = router;
+export default router;

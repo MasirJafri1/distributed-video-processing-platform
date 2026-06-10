@@ -1,12 +1,9 @@
-const { createClient } =
-  require("redis");
+import { createClient } from "redis";
 
-const redisClient =
-  createClient({
-    url: process.env.REDIS_URL || "redis://localhost:6379"
-  });
+const redisClient = createClient({
+  url: process.env.REDIS_URL || "redis://localhost:6379",
+});
 
 redisClient.connect();
 
-module.exports =
-  redisClient;
+export default redisClient;

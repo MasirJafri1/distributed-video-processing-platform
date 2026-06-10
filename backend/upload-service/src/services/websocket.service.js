@@ -1,23 +1,18 @@
-const prisma =
-  require("../db/prisma");
+import prisma from "../db/prisma.js";
 
-async function saveConnection(
-  connectionId
-) {
+async function saveConnection(connectionId) {
   return prisma.webSocketConnection.create({
     data: {
-      id: connectionId
-    }
+      id: connectionId,
+    },
   });
 }
 
-async function removeConnection(
-  connectionId
-) {
+async function removeConnection(connectionId) {
   return prisma.webSocketConnection.deleteMany({
     where: {
-      id: connectionId
-    }
+      id: connectionId,
+    },
   });
 }
 
@@ -25,8 +20,4 @@ async function getConnections() {
   return prisma.webSocketConnection.findMany();
 }
 
-module.exports = {
-  saveConnection,
-  removeConnection,
-  getConnections
-};
+export { saveConnection, removeConnection, getConnections };

@@ -1,48 +1,43 @@
-const express =
-  require("express");
-
-const {
+import express from "express";
+import {
   saveConnection,
-  removeConnection
-} = require(
-  "../services/websocket.service"
-);
+  removeConnection,
+} from "../services/websocket.service.js";
 
-const router =
-  express.Router();
+const router = express.Router();
 
-router.post(
-  "/connect",
-  async (req, res) => {
-    const connectionId = req.body.connectionId || req.body.requestContext?.connectionId || req.headers["x-connection-id"];
+router.post("/connect", async (req, res) => {
+  const connectionId =
+    req.body.connectionId ||
+    req.body.requestContext?.connectionId ||
+    req.headers["x-connection-id"];
 
-    if (!connectionId) {
-      return res.status(400).json({ error: "connectionId is required" });
-    }
-
-    await saveConnection(connectionId);
-
-    res.json({
-      success: true
-    });
+  if (!connectionId) {
+    return res.status(400).json({ error: "connectionId is required" });
   }
-);
 
-router.post(
-  "/disconnect",
-  async (req, res) => {
-    const connectionId = req.body.connectionId || req.body.requestContext?.connectionId || req.headers["x-connection-id"];
+  await saveConnection(connectionId);
 
-    if (!connectionId) {
-      return res.status(400).json({ error: "connectionId is required" });
-    }
+  res.json({
+    success: true,
+  });
+});
 
-    await removeConnection(connectionId);
+router.post("/disconnect", async (req, res) => {
+  const connectionId =
+    req.body.connectionId ||
+    req.body.requestContext?.connectionId ||
+    req.headers["x-connection-id"];
 
-    res.json({
-      success: true
-    });
+  if (!connectionId) {
+    return res.status(400).json({ error: "connectionId is required" });
   }
-);
 
-module.exports = router;
+  await removeConnection(connectionId);
+
+  res.json({
+    success: true,
+  });
+});
+
+export default router;

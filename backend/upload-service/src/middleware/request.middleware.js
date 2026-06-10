@@ -1,26 +1,18 @@
-const { v4: uuidv4 } =
-  require("uuid");
+import { v4 as uuidv4 } from "uuid";
+import logger from "../utils/logger.js";
 
-const logger =
-  require("../utils/logger");
+const requestMiddleware = (req, res, next) => {
+  const requestId = uuidv4();
 
-const requestMiddleware =
-  (req, res, next) => {
+  req.requestId = requestId;
 
-    const requestId = uuidv4();
+  logger.info({
+    requestId,
+    method: req.method,
+    path: req.path,
+  });
 
-    req.requestId = requestId;
+  next();
+};
 
-    logger.info({
-      requestId,
-
-      method: req.method,
-
-      path: req.path
-    });
-
-    next();
-  };
-
-module.exports =
-  requestMiddleware;
+export default requestMiddleware;

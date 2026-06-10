@@ -1,27 +1,14 @@
-const express =
-  require("express");
+import express from "express";
+import { notifyVideoCompleted } from "../services/notification.service.js";
 
-const {
-  notifyVideoCompleted
-} = require(
-  "../services/notification.service"
-);
+const router = express.Router();
 
-const router =
-  express.Router();
+router.post("/video-completed", async (req, res) => {
+  await notifyVideoCompleted(req.body);
 
-router.post(
-  "/video-completed",
-  async (req, res) => {
+  res.json({
+    success: true,
+  });
+});
 
-    await notifyVideoCompleted(
-      req.body
-    );
-
-    res.json({
-      success: true
-    });
-  }
-);
-
-module.exports = router;
+export default router;

@@ -1,22 +1,14 @@
-const {
-  SQSClient,
-  SendMessageCommand
-} = require("@aws-sdk/client-sqs");
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 
 const sqsClient = new SQSClient({
   region: process.env.AWS_REGION,
 });
 
-const publishVideoJob = async (payload) => {
+export const publishVideoJob = async (payload) => {
   const command = new SendMessageCommand({
     QueueUrl: process.env.SQS_QUEUE_URL,
-
-    MessageBody: JSON.stringify(payload)
+    MessageBody: JSON.stringify(payload),
   });
 
   await sqsClient.send(command);
-};
-
-module.exports = {
-  publishVideoJob
 };

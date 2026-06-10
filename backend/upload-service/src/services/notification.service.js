@@ -1,26 +1,11 @@
-const {
-  broadcast
-} = require(
-  "./realtime.service"
-);
+import { broadcast } from "./realtime.service.js";
+import * as EVENTS from "../constants/events.js";
 
-const EVENTS =
-  require(
-    "../constants/events"
-  );
-
-async function notifyVideoCompleted(
-  video
-) {
-
+async function notifyVideoCompleted(video) {
   await broadcast({
-    type:
-      EVENTS.VIDEO_COMPLETED,
-
-    video
+    type: EVENTS.VIDEO_COMPLETED,
+    video,
   });
 }
 
-module.exports = {
-  notifyVideoCompleted
-};
+export { notifyVideoCompleted };
