@@ -4,7 +4,7 @@
 
 [![Deploy to EC2](https://github.com/MasirJafri1/distributed-video-processing-platform/actions/workflows/deploy.yml/badge.svg)](https://github.com/MasirJafri1/distributed-video-processing-platform/actions/workflows/deploy.yml)
 [![Live Demo](https://img.shields.io/badge/demo-live-green)](https://video-processing.masir-projects.me)
-[![License: MIT](https://github.com/MasirJafri1/distributed-video-processing-platform/tree/main?tab=MIT-1-ov-file)
+[![License: MIT](https://github.com/MasirJafri1/distributed-video-processing-platform/blob/main/LICENSE)
 
 ---
 
