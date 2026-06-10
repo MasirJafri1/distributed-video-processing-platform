@@ -5,6 +5,26 @@ import VideoDetailLayout from "@/components/video/VideoDetailLayout";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  try {
+    const video = await getVideo(id);
+    if (video && !video.error) {
+      return {
+        title: `${video.title || "Video Asset"} - Pipeline Details`,
+        description: `Stream HLS segments, monitor AWS workflow status, and debug dynamic resolution levels for video "${video.title || "Video"}" (ID: ${id}).`,
+      };
+    }
+  } catch (err) {
+    console.error("Failed to generate metadata for video page:", err);
+  }
+  return {
+    title: "Video Detail Console",
+    description:
+      "Real-time adaptive bitrate HLS video playback and pipeline log tracking.",
+  };
+}
+
 export default async function VideoPage({ params }) {
   const { id } = await params;
   let video = null;

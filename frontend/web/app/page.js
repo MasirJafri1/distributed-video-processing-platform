@@ -1,10 +1,14 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArchitecturePipeline from "@/components/ArchitecturePipeline";
+
+export const metadata = {
+  title: "Flux - Distributed Cloud Video Transcoding & Streaming",
+  description:
+    "An industry-grade, real-time distributed video transcoding pipeline. Transcode source media using FFmpeg, manage queue jobs via SQS, and cache streams globally on CDN.",
+};
 
 export default function Home() {
   const features = [
