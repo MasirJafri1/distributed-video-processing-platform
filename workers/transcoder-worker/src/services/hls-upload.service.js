@@ -1,42 +1,22 @@
-const fs =
-  require("fs");
+import fs from "fs";
+import path from "path";
+import { uploadFile } from "./s3.service.js";
 
-const path =
-  require("path");
+async function uploadDirectory(directory, prefix) {
+  const files = fs.readdirSync(directory);
 
-const {
-  uploadFile
-} = require(
-  "./s3.service"
-);
-
-async function uploadDirectory(
-  directory,
-  prefix
-) {
-
-  const files =
-    fs.readdirSync(
-      directory
-    );
-
-  for (
-    const file
-    of files
-  ) {
-
+  for (const file of files) {
     const ext = path.extname(file);
-    const contentType = ext === ".m3u8" ? "application/x-mpegURL" : "video/MP2T";
+    const contentType =
+      ext === ".m3u8" ? "application/x-mpegURL" : "video/MP2T";
 
     await uploadFile(
       process.env.PROCESSED_BUCKET_NAME,
       `${prefix}/${file}`,
       `${directory}/${file}`,
-      contentType
+      contentType,
     );
   }
 }
 
-module.exports = {
-  uploadDirectory
-};
+export { uploadDirectory };

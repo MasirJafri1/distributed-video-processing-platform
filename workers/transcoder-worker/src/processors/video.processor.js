@@ -1,48 +1,20 @@
-const path = require("path");
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import logger from "../utils/logger.js";
+import { downloadFile, uploadFile } from "../services/s3.service.js";
+import { generateThumbnail } from "../services/thumbnail.service.js";
+import { transcodeVideo } from "./transcoder.processor.js";
+import { generateHLS } from "./hls.processor.js";
+import { markVideoProcessed } from "../services/video.service.js";
+import { notifyVideoCompleted } from "../services/notification.service.js";
+import { createHlsVariant } from "../services/hls.service.js";
+import { uploadDirectory } from "../services/hls-upload.service.js";
+import { generateMasterPlaylist } from "../services/master-playlist.service.js";
 
-const fs = require("fs");
-
-const logger =
-  require("../utils/logger");
-
-const {
-  downloadFile,
-  uploadFile
-} = require("../services/s3.service");
-
-const {
-  generateThumbnail
-} = require("../services/thumbnail.service");
-
-const {
-  transcodeVideo
-} = require("./transcoder.processor");
-
-const {
-  generateHLS
-} = require("./hls.processor");
-
-const {
-  markVideoProcessed
-} = require("../services/video.service");
-
-const {
-  notifyVideoCompleted
-} = require("../services/notification.service");
-
-const {
-  createHlsVariant
-} = require("../services/hls.service");
-
-const {
-  uploadDirectory
-} = require("../services/hls-upload.service");
-
-const {
-  generateMasterPlaylist
-} = require(
-  "../services/master-playlist.service"
-);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const processVideoJob = async (job) => {
   try {
@@ -52,66 +24,38 @@ const processVideoJob = async (job) => {
 
     const videoId = job.videoId;
 
-    const tempDir = path.join(
-      __dirname,
-      "../../temp"
-    );
+    const tempDir = path.join(__dirname, "../../temp");
 
-    const outputDir = path.join(
-      __dirname,
-      "../../output"
-    );
+    const outputDir = path.join(__dirname, "../../output");
 
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir, {
-        recursive: true
+        recursive: true,
       });
     }
 
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, {
-        recursive: true
+        recursive: true,
       });
     }
 
-    fs.mkdirSync(
-      "/app/temp/360p",
-      { recursive: true }
-    );
+    fs.mkdirSync("/app/temp/360p", { recursive: true });
 
-    fs.mkdirSync(
-      "/app/temp/480p",
-      { recursive: true }
-    );
+    fs.mkdirSync("/app/temp/480p", { recursive: true });
 
-    fs.mkdirSync(
-      "/app/temp/720p",
-      { recursive: true }
-    );
+    fs.mkdirSync("/app/temp/720p", { recursive: true });
 
-    fs.mkdirSync(
-      "/app/temp/thumbnails",
-      { recursive: true }
-    );
+    fs.mkdirSync("/app/temp/thumbnails", { recursive: true });
 
-    const inputPath = path.join(
-      tempDir,
-      "input.mp4"
-    );
+    const inputPath = path.join(tempDir, "input.mp4");
 
-    await downloadFile(
-      process.env.RAW_BUCKET_NAME,
-      job.s3Key,
-      inputPath
-    );
+    await downloadFile(process.env.RAW_BUCKET_NAME, job.s3Key, inputPath);
 
     logger.info("Video downloaded");
 
     logger.info("Generating thumbnail");
-    await generateThumbnail(
-      inputPath,
-      "/app/temp/thumbnails"
-    );
+    await generateThumbnail(inputPath, "/app/temp/thumbnails");
 
     logger.info("Uploading thumbnail");
     const thumbnailKey = `thumbnails/${videoId}.jpg`;
@@ -119,63 +63,34 @@ const processVideoJob = async (job) => {
       process.env.THUMBNAIL_BUCKET_NAME || process.env.PROCESSED_BUCKET_NAME,
       thumbnailKey,
       "/app/temp/thumbnails/thumbnail.jpg",
-      "image/jpeg"
+      "image/jpeg",
     );
 
-    await createHlsVariant(
-      inputPath,
-      "/app/temp/360p",
-      360,
-      "800k"
-    );
+    await createHlsVariant(inputPath, "/app/temp/360p", 360, "800k");
 
-    await createHlsVariant(
-      inputPath,
-      "/app/temp/480p",
-      480,
-      "1400k"
-    );
+    await createHlsVariant(inputPath, "/app/temp/480p", 480, "1400k");
 
-    await createHlsVariant(
-      inputPath,
-      "/app/temp/720p",
-      720,
-      "2800k"
-    );
+    await createHlsVariant(inputPath, "/app/temp/720p", 720, "2800k");
 
     logger.info("HLS variant generation completed");
 
-    fs.mkdirSync(
-      "/app/temp/hls",
-      {
-        recursive: true
-      }
-    );
+    fs.mkdirSync("/app/temp/hls", {
+      recursive: true,
+    });
 
-    await generateMasterPlaylist(
-      "/app/temp/hls/master.m3u8"
-    );
+    await generateMasterPlaylist("/app/temp/hls/master.m3u8");
 
-    await uploadDirectory(
-      "/app/temp/360p",
-      `hls/${videoId}/360p`
-    );
+    await uploadDirectory("/app/temp/360p", `hls/${videoId}/360p`);
 
-    await uploadDirectory(
-      "/app/temp/480p",
-      `hls/${videoId}/480p`
-    );
+    await uploadDirectory("/app/temp/480p", `hls/${videoId}/480p`);
 
-    await uploadDirectory(
-      "/app/temp/720p",
-      `hls/${videoId}/720p`
-    );
+    await uploadDirectory("/app/temp/720p", `hls/${videoId}/720p`);
 
     await uploadFile(
       process.env.PROCESSED_BUCKET_NAME,
       `hls/${videoId}/master.m3u8`,
       "/app/temp/hls/master.m3u8",
-      "application/x-mpegURL"
+      "application/x-mpegURL",
     );
 
     logger.info("HLS directories uploaded");
@@ -185,14 +100,14 @@ const processVideoJob = async (job) => {
       `hls/${videoId}/master.m3u8`,
       null,
       `hls/${videoId}/360p/index.m3u8`,
-      thumbnailKey
+      thumbnailKey,
     );
 
     logger.info("Database updated");
 
     await notifyVideoCompleted({
       id: videoId,
-      status: "COMPLETED"
+      status: "COMPLETED",
     });
 
     // Clean up local files
@@ -217,22 +132,25 @@ const processVideoJob = async (job) => {
     }
 
     const duration = Date.now() - start;
-    logger.info({
-      videoId,
-      duration
-    }, "Processing completed");
+    logger.info(
+      {
+        videoId,
+        duration,
+      },
+      "Processing completed",
+    );
 
     logger.info("Cleanup completed");
-
   } catch (error) {
-    logger.error({
-      videoId: job.videoId,
-      error: error.message
-    }, "Video processing failed");
+    logger.error(
+      {
+        videoId: job.videoId,
+        error: error.message,
+      },
+      "Video processing failed",
+    );
     throw error;
   }
 };
 
-module.exports = {
-  processVideoJob
-};
+export { processVideoJob };

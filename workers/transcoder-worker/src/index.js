@@ -1,15 +1,7 @@
-require("dotenv").config();
-
-const {
-  pollMessages,
-  deleteMessage
-} = require("./queue/sqs.consumer");
-
-const {
-  processVideoJob
-} = require("./processors/video.processor");
-
-const logger = require("./utils/logger");
+import "dotenv/config";
+import { pollMessages, deleteMessage } from "./queue/sqs.consumer.js";
+import { processVideoJob } from "./processors/video.processor.js";
+import logger from "./utils/logger.js";
 
 const startWorker = async () => {
   logger.info("Worker started");
@@ -19,10 +11,7 @@ const startWorker = async () => {
       const messages = await pollMessages();
 
       if (!messages.length) {
-
-        await new Promise((resolve) =>
-          setTimeout(resolve, 5000)
-        );
+        await new Promise((resolve) => setTimeout(resolve, 5000));
         continue;
       }
 
@@ -43,52 +32,34 @@ const startWorker = async () => {
           const body = {
             videoId,
             fileName,
-            s3Key
+            s3Key,
           };
 
           try {
-
             await processVideoJob(body);
 
-            await deleteMessage(
-              message.ReceiptHandle
-            );
+            await deleteMessage(message.ReceiptHandle);
 
-            logger.info(
-              "Message processed successfully"
-            );
+            logger.info("Message processed successfully");
 
-            logger.info(
-              "Message deleted from queue"
-            );
-
+            logger.info("Message deleted from queue");
           } catch (error) {
-
             logger.error(error);
 
-            logger.error(
-              "Message processing failed"
-            );
+            logger.error("Message processing failed");
           }
-        })
+        }),
       );
-
     } catch (error) {
       logger.error(error);
     }
   }
 };
 
-process.on(
-  "SIGTERM",
-  async () => {
+process.on("SIGTERM", async () => {
+  logger.info("Graceful shutdown initiated");
 
-    logger.info(
-      "Graceful shutdown initiated"
-    );
+  process.exit(0);
+});
 
-    process.exit(0);
-  }
-);
-
-startWorker();  
+startWorker();

@@ -1,40 +1,29 @@
-const prisma =
-  require("../db/prisma");
-const redisClient =
-  require("../config/redis");
+import prisma from "../db/prisma.js";
+import redisClient from "../config/redis.js";
 
-const markVideoProcessed =
-  async (
-    videoId,
-    masterPlaylistKey,
-    thumbnailUrl,
-    hlsUrl,
-    thumbnailKey
-  ) => {
-
+const markVideoProcessed = async (
+  videoId,
+  masterPlaylistKey,
+  thumbnailUrl,
+  hlsUrl,
+  thumbnailKey,
+) => {
   const updatedVideo = await prisma.video.update({
     where: {
-      id: videoId
+      id: videoId,
     },
-
     data: {
       status: "COMPLETED",
-
       masterPlaylistKey,
-
       thumbnailUrl,
-
       hlsMasterUrl: hlsUrl,
-
-      thumbnailKey
-    }
+      thumbnailKey,
+    },
   });
 
-await redisClient.del("videos");
+  await redisClient.del("videos");
 
-return updatedVideo;
+  return updatedVideo;
 };
 
-module.exports = {
-  markVideoProcessed
-};
+export { markVideoProcessed };

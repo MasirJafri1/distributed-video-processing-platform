@@ -1,5 +1,5 @@
-const pino = require("pino");
+import pino from "pino";
 
-module.exports = pino({
-  level: "info"
+export default pino({
+  level: "info",
 });

@@ -1,8 +1,8 @@
-const {
+import {
   SQSClient,
   ReceiveMessageCommand,
-  DeleteMessageCommand
-} = require("@aws-sdk/client-sqs");
+  DeleteMessageCommand,
+} from "@aws-sdk/client-sqs";
 
 const sqsClient = new SQSClient({
   region: process.env.AWS_REGION,
@@ -12,7 +12,7 @@ const pollMessages = async () => {
   const command = new ReceiveMessageCommand({
     QueueUrl: process.env.SQS_QUEUE_URL,
     MaxNumberOfMessages: 2,
-    WaitTimeSeconds: 20
+    WaitTimeSeconds: 20,
   });
 
   const response = await sqsClient.send(command);
@@ -23,14 +23,10 @@ const pollMessages = async () => {
 const deleteMessage = async (receiptHandle) => {
   const command = new DeleteMessageCommand({
     QueueUrl: process.env.SQS_QUEUE_URL,
-
-    ReceiptHandle: receiptHandle
+    ReceiptHandle: receiptHandle,
   });
 
   await sqsClient.send(command);
 };
 
-module.exports = {
-  pollMessages,
-  deleteMessage
-};
+export { pollMessages, deleteMessage };

@@ -1,10 +1,6 @@
-const fs =
-  require("fs");
+import fs from "fs";
 
-async function generateMasterPlaylist(
-  outputPath
-) {
-
+async function generateMasterPlaylist(outputPath) {
   const content = `#EXTM3U
 
 #EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=640x360
@@ -17,12 +13,7 @@ async function generateMasterPlaylist(
 720p/index.m3u8
 `;
 
-  fs.writeFileSync(
-    outputPath,
-    content
-  );
+  fs.writeFileSync(outputPath, content);
 }
 
-module.exports = {
-  generateMasterPlaylist
-};
+export { generateMasterPlaylist };

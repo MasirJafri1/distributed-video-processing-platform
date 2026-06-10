@@ -1,25 +1,11 @@
-const ffmpeg = require("fluent-ffmpeg");
+import ffmpeg from "fluent-ffmpeg";
 
-const transcodeVideo = (
-  inputPath,
-  outputPath
-) => {
+export const transcodeVideo = (inputPath, outputPath) => {
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-
-      .outputOptions([
-        "-preset fast",
-        "-crf 28"
-      ])
-
+      .outputOptions(["-preset fast", "-crf 28"])
       .save(outputPath)
-
       .on("end", resolve)
-
       .on("error", reject);
   });
-};
-
-module.exports = {
-  transcodeVideo
 };
