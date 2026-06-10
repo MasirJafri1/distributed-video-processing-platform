@@ -7,8 +7,9 @@ function createHlsVariant(inputPath, outputDir, height, bitrate) {
       .size(`?x${height}`)
       .outputOptions([
         `-b:v ${bitrate}`,
-        "-preset veryfast",
+        "-preset ultrafast",
         "-profile:v main",
+        "-threads 0",
         "-hls_time 6",
         "-hls_playlist_type vod",
         "-hls_list_size 0",
