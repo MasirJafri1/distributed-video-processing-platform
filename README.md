@@ -4,7 +4,7 @@
 
 [![Deploy to EC2](https://github.com/MasirJafri1/distributed-video-processing-platform/actions/workflows/deploy.yml/badge.svg)](https://github.com/MasirJafri1/distributed-video-processing-platform/actions/workflows/deploy.yml)
 [![Live Demo](https://img.shields.io/badge/demo-live-green)](https://video-processing.masir-projects.me)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://github.com/MasirJafri1/distributed-video-processing-platform/tree/main?tab=MIT-1-ov-file)
 
 ---
 
@@ -54,7 +54,7 @@ For detailed architecture diagrams, see [docs/architecture/overview.md](docs/arc
 | Layer | Technology |
 |---|---|
 | **Frontend** | Next.js 14, HLS.js, React |
-| **Backend API** | Node.js, Express, Fluxa |
+| **Backend API** | Node.js, Express, Prisma |
 | **Worker** | Node.js, FFmpeg (fluent-ffmpeg) |
 | **Database** | PostgreSQL 16 |
 | **Cache** | Redis 7 |
@@ -80,8 +80,8 @@ For detailed architecture diagrams, see [docs/architecture/overview.md](docs/arc
 │       │   ├── controllers/     # Route handlers
 │       │   ├── services/        # Business logic (S3, cookies, WebSocket)
 │       │   ├── middleware/       # Rate limiting, error handling
-│       │   └── db/              # Fluxa client
-│       └── Fluxa/              # Database schema + migrations
+│       │   └── db/              # Prisma client
+│       └── Prisma/              # Database schema + migrations
 │
 ├── workers/
 │   └── transcoder-worker/       # FFmpeg processing worker
@@ -89,7 +89,7 @@ For detailed architecture diagrams, see [docs/architecture/overview.md](docs/arc
 │       │   ├── queue/           # SQS consumer
 │       │   ├── processors/      # Job orchestration
 │       │   └── services/        # S3, HLS, thumbnail, notification
-│       └── Fluxa/              # Database schema + migrations
+│       └── Prisma/              # Database schema + migrations
 │
 ├── frontend/
 │   └── web/                     # Next.js application
