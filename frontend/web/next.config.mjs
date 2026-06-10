@@ -7,17 +7,15 @@ const nextConfig = {
       {
         protocol: "https",
 
-        hostname:
-          "*.amazonaws.com"
+        hostname: "*.amazonaws.com",
       },
       {
         protocol: "https",
 
-        hostname:
-          "*.masir-projects.me"
-      }
-    ]
-  }
+        hostname: "*.masir-projects.me",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

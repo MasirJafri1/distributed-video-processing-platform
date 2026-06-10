@@ -10,8 +10,8 @@ export default function VideoPlayer({ src, videoId }) {
 
   // Step 1: Fetch playback cookies from the backend before loading HLS
   useEffect(() => {
-    if (!videoId) {
-      // If no videoId is provided, skip cookie fetching (backward compat)
+    if (!videoId || (src && src.startsWith("/api/hls"))) {
+      // If no videoId is provided or streaming via local API proxy, skip browser-side cookies
       setCookiesReady(true);
       return;
     }
@@ -21,7 +21,7 @@ export default function VideoPlayer({ src, videoId }) {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         const res = await fetch(
           `${apiUrl}/videos/${videoId}/playback-cookies`,
-          { credentials: "include" }
+          { credentials: "include" },
         );
 
         if (!res.ok) {
@@ -36,7 +36,7 @@ export default function VideoPlayer({ src, videoId }) {
     };
 
     fetchCookies();
-  }, [videoId]);
+  }, [videoId, src]);
 
   // Step 2: Once cookies are set, initialize HLS player with credentials
   useEffect(() => {
@@ -47,8 +47,10 @@ export default function VideoPlayer({ src, videoId }) {
     if (Hls.isSupported()) {
       const hls = new Hls({
         xhrSetup: (xhr) => {
-          xhr.withCredentials = true;
-        }
+          if (src && !src.startsWith("/api/hls")) {
+            xhr.withCredentials = true;
+          }
+        },
       });
       hls.loadSource(src);
       hls.attachMedia(video);
@@ -80,7 +82,7 @@ export default function VideoPlayer({ src, videoId }) {
           height: "100%",
           color: "#ef4444",
           fontSize: "0.875rem",
-          padding: "1rem"
+          padding: "1rem",
         }}
       >
         {error}
@@ -98,7 +100,7 @@ export default function VideoPlayer({ src, videoId }) {
           width: "100%",
           height: "100%",
           color: "#94a3b8",
-          fontSize: "0.875rem"
+          fontSize: "0.875rem",
         }}
       >
         Preparing secure playback...
@@ -110,10 +112,7 @@ export default function VideoPlayer({ src, videoId }) {
     <video
       ref={videoRef}
       controls
-      width="100%"
-      style={{
-        maxWidth: "900px"
-      }}
+      className="w-full h-full object-contain rounded-2xl border border-zinc-800 bg-black"
     />
   );
 }
