@@ -85,9 +85,14 @@ export default function UpNextSidebar({ currentVideoId }) {
                 <h4 className="text-sm font-bold text-zinc-900 truncate group-hover:text-black">
                   {vid.fileName}
                 </h4>
-                <p className="text-[10px] text-zinc-400 mt-1 uppercase font-semibold">
-                  Ready to stream
-                </p>
+                <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                  <span className="text-[9px] font-mono font-bold bg-zinc-50 border border-zinc-200 text-zinc-600 px-1.5 py-0.5 rounded">
+                    360p • 480p • 720p
+                  </span>
+                  <span className="text-[9px] font-mono font-bold bg-emerald-50 border border-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded">
+                    CDN Cached
+                  </span>
+                </div>
               </div>
             </div>
           </Link>
